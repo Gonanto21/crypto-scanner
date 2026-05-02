@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Revolut X · Pro Scanner v5.2 · LIVE</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#131a2e;
+      --panel-2:#18213a;
+      --line:#26314f;
+      --text:#edf2ff;
+      --muted:#9aa6c7;
+      --blue:#5aa7ff;
+      --cyan:#33d3ff;
+      --green:#24d18b;
+      --red:#ff6b7a;
+      --amber:#ffbd59;
+      --violet:#8f7dff;
+      --chip:#202948;
+      --shadow:0 16px 40px rgba(0,0,0,.28);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#09101f 0%,#0b1020 100%);color:var(--text);font-family:var(--sans)}
+    body{min-height:100vh}
+    .wrap{max-width:1500px;margin:0 auto;padding:20px}
+    .topbar{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+      margin-bottom:18px;flex-wrap:wrap
+    }
+    .title h1{margin:0;font-size:28px;letter-spacing:.2px}
+    .title .sub{margin-top:6px;color:var(--muted);font-size:14px}
+    .live{
+      display:flex;align-items:center;gap:12px;flex-wrap:wrap
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(36,209,139,.14);border:1px solid rgba(36,209,139,.28);
+      color:#9ff2cb;padding:8px 12px;border-radius:999px;font-size:13px
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(36,209,139,.12)}
+    .btn{
+      background:linear-gradient(180deg,#1c2744,#18213a);color:var(--text);border:1px solid var(--line);
+      padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600
+    }
+    .btn:hover{filter:brightness(1.06)}
+    .session{
+      display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:8px 0 18px
+    }
+    .session span{
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+      padding:8px 10px;border-radius:999px
+    }
+    .tabs{
+      display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px
+    }
+    .tab{
+      background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;
+      color:var(--muted);cursor:pointer;font-weight:700
+    }
+    .tab.active{color:var(--text);background:linear-gradient(180deg,#1a2441,#141c32)}
+    .stats{
+      display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px
+    }
+    .stat{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);
+      border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)
+    }
+    .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .stat .v{font-size:30px;font-weight:800;margin-top:6px}
+    .view{display:none}
+    .view.active{display:block}
+    .controls{
+      display:grid;grid-template-columns:1fr repeat(3,180px) 120px;gap:12px;margin-bottom:16px
+    }
+    .control{
+      background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px
+    }
+    .control label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+    .control input,.control select{
+      width:100%;background:#0f1730;border:1px solid #293456;color:var(--text);border-radius:10px;
+      padding:10px 11px;outline:none
+    }
+    .grid-main{
+      display:grid;grid-template-columns:minmax(400px,1fr) minmax(360px,430px);gap:16px;align-items:start
+    }
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);
+      border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)
+    }
+    .list{display:grid;gap:12px}
+    .card{
+      background:#0f1730;border:1px solid #243052;border-radius:14px;padding:14px;cursor:pointer;transition:.18s ease
+    }
+    .card:hover{transform:translateY(-1px);border-color:#3a4a77}
+    .card.active{border-color:rgba(90,167,255,.65);box-shadow:0 0 0 1px rgba(90,167,255,.18) inset}
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .symbol{font-size:18px;font-weight:800;letter-spacing:.02em}
+    .name{margin-top:4px;color:var(--muted);font-size:13px}
+    .price{font-size:20px;font-weight:800}
+    .change{font-family:var(--mono);font-size:12px;margin-top:6px}
+    .g{color:var(--green)} .r{color:var(--red)}
+    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .pill{
+      font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+      padding:6px 9px;border-radius:999px;background:var(--chip);border:1px solid #31416d
+    }
+    .pill.buy{background:rgba(36,209,139,.12);color:#b7f5d8;border-color:rgba(36,209,139,.35)}
+    .pill.sell{background:rgba(255,107,122,.12);color:#ffc1c8;border-color:rgba(255,107,122,.32)}
+    .pill.watch{background:rgba(255,189,89,.12);color:#ffe2aa;border-color:rgba(255,189,89,.32)}
+    .pill.hold{background:rgba(143,125,255,.12);color:#ddd6ff;border-color:rgba(143,125,255,.32)}
+    .pill.state,.pill.setup{color:#d7e3ff}
+    .mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+    .mini{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:10px}
+    .mini .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .mini .v{margin-top:6px;font-size:14px;font-family:var(--mono);font-weight:700}
+    h3{margin:0 0 12px;font-size:15px}
+    .detail-price{font-size:34px;font-weight:900;margin-top:10px}
+    .grid2,.grid3,.grid4{display:grid;gap:10px}
+    .grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .kv,.rank-item{
+      background:#0f1730;border:1px solid #243052;border-radius:12px;padding:11px
+    }
+    .kv .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .kv .v{margin-top:6px;font-weight:800;font-family:var(--mono)}
+    .bar-wrap{display:grid;gap:10px}
+    .bar-row{display:grid;grid-template-columns:94px 1fr 48px;gap:10px;align-items:center}
+    .bar-label{font-size:12px;color:var(--muted)}
+    .bar{
+      height:10px;background:#0d1530;border:1px solid #263457;border-radius:999px;overflow:hidden
+    }
+    .bar span{display:block;height:100%;border-radius:999px}
+    .bar-value{text-align:right;font-family:var(--mono);font-weight:800;font-size:12px}
+    .tbl{display:grid;gap:8px}
+    .tbl-row{
+      display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+      border-bottom:1px dashed rgba(255,255,255,.08);padding:8px 0
+    }
+    .tbl-row:last-child{border-bottom:0}
+    .tbl-row .label{color:var(--muted);font-size:12px}
+    .tbl-row .value{font-weight:700;font-family:var(--mono)}
+    .overview{
+      display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:16px
+    }
+    .rank-list{display:grid;gap:10px}
+    .rank-item{
+      display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center
+    }
+    .rank-num{
+      width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+      background:#1d2850;border:1px solid #30406f;font-weight:900
+    }
+    .sub{color:var(--muted);font-size:13px}
+    .footer{
+      color:var(--muted);font-size:12px;margin-top:16px;text-align:center;padding-bottom:12px
+    }
+    @media (max-width:1200px){
+      .grid-main,.overview{grid-template-columns:1fr}
+    }
+    @media (max-width:900px){
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .controls{grid-template-columns:1fr 1fr}
+      .grid3,.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width:560px){
+      .wrap{padding:14px}
+      .stats{grid-template-columns:1fr}
+      .controls{grid-template-columns:1fr}
+      .grid2,.grid3,.grid4{grid-template-columns:1fr}
+      .bar-row{grid-template-columns:78px 1fr 42px}
+      .title h1{font-size:23px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Revolut X · Pro Scanner v5.2 · LIVE</h1>
+        <div class="sub">Revolut X live market mode</div>
+      </div>
+      <div class="live">
+        <div class="badge"><span class="dot"></span><span id="liveText">LIVE · Revolut X filtered scan · --:--</span></div>
+        <button id="refreshBtn" class="btn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="session" id="sessionBar"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-view="scannerView">SCANNER</button>
+      <button class="tab" data-view="marketView">MARKET</button>
+      <button class="tab" data-view="setupsView">SETUPS</button>
+      <button class="tab" data-view="healthView">HEALTH</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">BUY</div><div class="v" id="buyCount">0</div></div>
+      <div class="stat"><div class="k">SELL</div><div class="v" id="sellCount">0</div></div>
+      <div class="stat"><div class="k">WATCH</div><div class="v" id="watchCount">0</div></div>
+      <div class="stat"><div class="k">HOLD</div><div class="v" id="holdCount">0</div></div>
+      <div class="stat"><div class="k">SCANNED</div><div class="v" id="scannedCount">0</div></div>
+    </div>
+
+    <section id="scannerView" class="view active">
+      <div class="controls">
+        <div class="control">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="text" placeholder="Search symbol, name, state, setup..." />
+        </div>
+        <div class="control">
+          <label for="signalFilter">Signal</label>
+          <select id="signalFilter">
+            <option value="all">All signals</option>
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+            <option value="watch">Watch</option>
+            <option value="hold">Hold</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="stateFilter">Market state</label>
+          <select id="stateFilter">
+            <option value="all">All states</option>
+            <option value="bull">Bull</option>
+            <option value="breakout">Breakout</option>
+            <option value="pullback">Pullback</option>
+            <option value="range">Range</option>
+            <option value="exhaustion">Exhaustion</option>
+            <option value="bear">Bear</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="sortBy">Sort</label>
+          <select id="sortBy">
+            <option value="bestbuy">Sort: best buy now</option>
+            <option value="score">Sort: score</option>
+            <option value="change24">Sort: 24h %</option>
+            <option value="volume">Sort: volume</option>
+            <option value="symbol">Sort: symbol</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="statusText">Status</label>
+          <input id="statusText" type="text" value="LIVE" readonly />
+        </div>
+      </div>
+
+      <div class="grid-main">
+        <div class="panel">
+          <h3>Scanner results</h3>
+          <div class="sub" style="margin-bottom:12px">Live CoinGecko data, filtered to Revolut X symbols only, ranked by best buy-now quality.</div>
+          <div id="tokenList" class="list"></div>
+        </div>
+        <div id="detailPane" class="panel"></div>
+      </div>
+    </section>
+
+    <section id="marketView" class="view">
+      <div class="overview">
+        <div class="panel">
+          <h3>Market overview</h3>
+          <div class="grid3">
+            <div class="kv"><div class="k">Configured</div><div class="v" id="ovConfigured">0</div></div>
+            <div class="kv"><div class="k">Scanned</div><div class="v" id="ovScanned">0</div></div>
+            <div class="kv"><div class="k">Missing</div><div class="v" id="ovMissing">0</div></div>
+            <div class="kv"><div class="k">Updated</div><div class="v" id="ovUpdated">--</div></div>
+            <div class="kv"><div class="k">Session</div><div class="v" id="ovSession">--</div></div>
+            <div class="kv"><div class="k">Avg RSI</div><div class="v" id="ovAvgRsi">--</div></div>
+            <div class="kv"><div class="k">Avg 24h</div><div class="v" id="ovAvg24">--</div></div>
+            <div class="kv"><div class="k">Above EMA20</div><div class="v" id="ovAboveEma">--</div></div>
+            <div class="kv"><div class="k">Above VWAP</div><div class="v" id="ovAboveVwap">--</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Breadth</h3>
+          <div id="breadthBars" class="bar-wrap"></div>
+        </div>
+        <div class="panel">
+          <h3>States</h3>
+          <div id="stateStats" class="grid2"></div>
+          <h3 style="margin-top:14px">Actions</h3>
+          <div id="actionStats" class="grid2"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="setupsView" class="view">
+      <div class="overview">
+        <div class="panel">
+          <h3>Top breakouts</h3>
+          <div id="breakoutList" class="rank-list"></div>
+        </div>
+        <div class="panel">
+          <h3>Top pullbacks</h3>
+          <div id="pullbackList" class="rank-list"></div>
+        </div>
+        <div class="panel">
+          <h3>Best buy now</h3>
+          <div id="bullList" class="rank-list"></div>
+        </div>
+      </div>
+      <div class="overview" style="margin-top:16px">
+        <div class="panel">
+          <h3>Bear setups</h3>
+          <div id="bearList" class="rank-list"></div>
+        </div>
+        <div class="panel" style="grid-column:span 2">
+          <h3>Setup notes</h3>
+          <div class="sub">
+            This version scans live CoinGecko data but only keeps tokens supported in the Revolut X universe, then ranks them by best buy-now quality.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="healthView" class="view">
+      <div class="overview">
+        <div class="panel">
+          <h3>Feed health</h3>
+          <div class="grid2">
+            <div class="kv"><div class="k">Configured</div><div class="v" id="healthConfigured">0</div></div>
+            <div class="kv"><div class="k">Scanned</div><div class="v" id="healthScanned">0</div></div>
+            <div class="kv"><div class="k">Missing</div><div class="v" id="healthMissing">0</div></div>
+            <div class="kv"><div class="k">Quality</div><div class="v" id="healthQuality">live</div></div>
+          </div>
+        </div>
+        <div class="panel" style="grid-column:span 2">
+          <h3>Scanner note</h3>
+          <div class="sub" id="missingText"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer" id="footerText">Ready.</div>
+  </div>
+
+  <script>
+    const APP_VERSION = "5.2.0";
+    const REFRESH_MS = 60000;
+    const API_PROXY_BASE = "https://crypto-scanner-proxy.apmg21.workers.dev";
+    const BASE_CURRENCY = "usd";
+    const SCAN_PAGES = 6;
+    const SCAN_PER_PAGE = 250;
+    const MIN_VOLUME_USD = 50000;
+
+    const REVOLUT_X_ASSETS = new Map([
+      ["bitcoin",               { symbol: "BTC",  tv: "BINANCE:BTCUSDT" }],
+      ["ethereum",              { symbol: "ETH",  tv: "BINANCE:ETHUSDT" }],
+      ["ripple",                { symbol: "XRP",  tv: "BINANCE:XRPUSDT" }],
+      ["solana",                { symbol: "SOL",  tv: "BINANCE:SOLUSDT" }],
+      ["cardano",               { symbol: "ADA",  tv: "BINANCE:ADAUSDT" }],
+      ["dogecoin",              { symbol: "DOGE", tv: "BINANCE:DOGEUSDT" }],
+      ["polkadot",              { symbol: "DOT",  tv: "BINANCE:DOTUSDT" }],
+      ["chainlink",             { symbol: "LINK", tv: "BINANCE:LINKUSDT" }],
+      ["avalanche-2",           { symbol: "AVAX", tv: "BINANCE:AVAXUSDT" }],
+      ["uniswap",               { symbol: "UNI",  tv: "BINANCE:UNIUSDT" }],
+      ["aave",                  { symbol: "AAVE", tv: "BINANCE:AAVEUSDT" }],
+      ["litecoin",              { symbol: "LTC",  tv: "BINANCE:LTCUSDT" }],
+      ["bitcoin-cash",          { symbol: "BCH",  tv: "BINANCE:BCHUSDT" }],
+      ["cosmos",                { symbol: "ATOM", tv: "BINANCE:ATOMUSDT" }],
+      ["stellar",               { symbol: "XLM",  tv: "BINANCE:XLMUSDT" }],
+      ["algorand",              { symbol: "ALGO", tv: "BINANCE:ALGOUSDT" }],
+      ["near",                  { symbol: "NEAR", tv: "BINANCE:NEARUSDT" }],
+      ["filecoin",              { symbol: "FIL",  tv: "BINANCE:FILUSDT" }],
+      ["aptos",                 { symbol: "APT",  tv: "BINANCE:APTUSDT" }],
+      ["arbitrum",              { symbol: "ARB",  tv: "BINANCE:ARBUSDT" }],
+      ["optimism",              { symbol: "OP",   tv: "BINANCE:OPUSDT" }],
+      ["injective-protocol",    { symbol: "INJ",  tv: "BINANCE:INJUSDT" }],
+      ["hedera-hashgraph",      { symbol: "HBAR", tv: "BINANCE:HBARUSDT" }],
+      ["ethereum-classic",      { symbol: "ETC",  tv: "BINANCE:ETCUSDT" }],
+      ["tron",                  { symbol: "TRX",  tv: "BINANCE:TRXUSDT" }],
+      ["sui",                   { symbol: "SUI",  tv: "BINANCE:SUIUSDT" }],
+      ["the-open-network",      { symbol: "TON",  tv: "BINANCE:TONUSDT" }],
+      ["pepe",                  { symbol: "PEPE", tv: "BINANCE:PEPEUSDT" }],
+      ["shiba-inu",             { symbol: "SHIB", tv: "BINANCE:SHIBUSDT" }],
+      ["sei-network",           { symbol: "SEI",  tv: "BINANCE:SEIUSDT" }],
+      ["render-token",          { symbol: "RENDER", tv: "BINANCE:RENDERUSDT" }],
+      ["ondo-finance",          { symbol: "ONDO", tv: "BINANCE:ONDOUSDT" }],
+      ["jupiter-exchange-solana",{ symbol: "JUP", tv: "BINANCE:JUPUSDT" }],
+      ["maker",                 { symbol: "MKR",  tv: "BINANCE:MKRUSDT" }],
+      ["lido-dao",              { symbol: "LDO",  tv: "BINANCE:LDOUSDT" }],
+      ["arweave",               { symbol: "AR",   tv: "BINANCE:ARUSDT" }],
+      ["the-graph",             { symbol: "GRT",  tv: "BINANCE:GRTUSDT" }],
+      ["axie-infinity",         { symbol: "AXS",  tv: "BINANCE:AXSUSDT" }],
+      ["immutable-x",           { symbol: "IMX",  tv: "BINANCE:IMXUSDT" }],
+      ["tezos",                 { symbol: "XTZ",  tv: "BINANCE:XTZUSDT" }],
+      ["eos",                   { symbol: "EOS",  tv: "BINANCE:EOSUSDT" }],
+      ["compound-governance-token",{ symbol: "COMP", tv: "BINANCE:COMPUSDT" }],
+      ["synthetix-network-token",{ symbol: "SNX", tv: "BINANCE:SNXUSDT" }],
+      ["curve-dao-token",       { symbol: "CRV",  tv: "BINANCE:CRVUSDT" }],
+      ["1inch",                 { symbol: "1INCH",tv: "BINANCE:1INCHUSDT" }],
+      ["pancakeswap-token",     { symbol: "CAKE", tv: "BINANCE:CAKEUSDT" }],
+      ["fetch-ai",              { symbol: "FET",  tv: "BINANCE:FETUSDT" }],
+      ["gala",                  { symbol: "GALA", tv: "BINANCE:GALAUSDT" }],
+      ["jasmycoin",             { symbol: "JASMY",tv: "BINANCE:JASMYUSDT" }],
+      ["yearn-finance",         { symbol: "YFI",  tv: "BINANCE:YFIUSDT" }],
+      ["enjincoin",             { symbol: "ENJ",  tv: "BINANCE:ENJUSDT" }],
+      ["decentraland",          { symbol: "MANA", tv: "BINANCE:MANAUSDT" }],
+      ["sandbox",               { symbol: "SAND", tv: "BINANCE:SANDUSDT" }],
+      ["chiliz",                { symbol: "CHZ",  tv: "BINANCE:CHZUSDT" }],
+      ["iota",                  { symbol: "IOTA", tv: "BINANCE:IOTAUSDT" }],
+      ["dash",                  { symbol: "DASH", tv: "BINANCE:DASHUSDT" }],
+      ["zcash",                 { symbol: "ZEC",  tv: "BINANCE:ZECUSDT" }],
+      ["nexo",                  { symbol: "NEXO", tv: "BINANCE:NEXOUSDT" }],
+      ["dai",                   { symbol: "DAI",  tv: "CRYPTOCAP:DAI" }],
+      ["usd-coin",              { symbol: "USDC", tv: "CRYPTOCAP:USDC" }],
+      ["tether",                { symbol: "USDT", tv: "CRYPTOCAP:USDT" }]
+    ]);
+
+    const REVOLUT_X_IDS = new Set(REVOLUT_X_ASSETS.keys());
+
+    const STABLE_OR_PEGGED_SYMBOLS = new Set([
+      "USDC","USDT","DAI","EURC","EURI"
+    ]);
+
+    const st = {
+      analyses: [],
+      filtered: [],
+      missing: [],
+      selectedId: null,
+      lastUpdated: null,
+      refreshInFlight: false,
+      apiErrors: 0
+    };
+
+    const els = {
+      tabs: [...document.querySelectorAll(".tab")],
+      views: [...document.querySelectorAll(".view")],
+      tokenList: document.getElementById("tokenList"),
+      detailPane: document.getElementById("detailPane"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      signalFilter: document.getElementById("signalFilter"),
+      stateFilter: document.getElementById("stateFilter"),
+      sortBy: document.getElementById("sortBy"),
+      searchInput: document.getElementById("searchInput"),
+      footerText: document.getElementById("footerText"),
+      sessionBar: document.getElementById("sessionBar"),
+      liveText: document.getElementById("liveText"),
+      statusText: document.getElementById("statusText"),
+      buyCount: document.getElementById("buyCount"),
+      sellCount: document.getElementById("sellCount"),
+      watchCount: document.getElementById("watchCount"),
+      holdCount: document.getElementById("holdCount"),
+      scannedCount: document.getElementById("scannedCount"),
+      ovConfigured: document.getElementById("ovConfigured"),
+      ovScanned: document.getElementById("ovScanned"),
+      ovMissing: document.getElementById("ovMissing"),
+      ovUpdated: document.getElementById("ovUpdated"),
+      ovSession: document.getElementById("ovSession"),
+      ovAvgRsi: document.getElementById("ovAvgRsi"),
+      ovAvg24: document.getElementById("ovAvg24"),
+      ovAboveEma: document.getElementById("ovAboveEma"),
+      ovAboveVwap: document.getElementById("ovAboveVwap"),
+      breadthBars: document.getElementById("breadthBars"),
+      stateStats: document.getElementById("stateStats"),
+      actionStats: document.getElementById("actionStats"),
+      breakoutList: document.getElementById("breakoutList"),
+      pullbackList: document.getElementById("pullbackList"),
+      bullList: document.getElementById("bullList"),
+      bearList: document.getElementById("bearList"),
+      healthConfigured: document.getElementById("healthConfigured"),
+      healthScanned: document.getElementById("healthScanned"),
+      healthMissing: document.getElementById("healthMissing"),
+      healthQuality: document.getElementById("healthQuality"),
+      missingText: document.getElementById("missingText")
+    };
+
+    const fmt = {
+      usd(v) {
+        if (v == null || isNaN(v)) return "--";
+        if (Math.abs(v) >= 1000) {
+          return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(v);
+        }
+        if (Math.abs(v) >= 1) {
+          return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(v);
+        }
+        return "$" + Number(v).toFixed(8).replace(/0+$/, "").replace(/\.$/, "");
+      },
+      compact(v) {
+        if (v == null || isNaN(v)) return "--";
+        return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(v);
+      },
+      pct(v, d = 2) {
+        if (v == null || isNaN(v)) return "--";
+        const s = v > 0 ? "+" : "";
+        return `${s}${Number(v).toFixed(d)}%`;
+      },
+      num(v, d = 2) {
+        if (v == null || isNaN(v)) return "--";
+        return Number(v).toFixed(d);
+      },
+      time(ts) {
+        if (!ts) return "--";
+        return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      },
+      dateTime(ts) {
+        if (!ts) return "--";
+        return new Date(ts).toLocaleString([], { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+      }
+    };
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function norm(v, min, max) { if (max === min) return 0; return clamp((v - min) / (max - min), 0, 1); }
+    function score100(x) { return Math.round(clamp(x, 0, 1) * 100); }
+    function avg(vals) { if (!vals?.length) return 0; return vals.reduce((a, b) => a + b, 0) / vals.length; }
+    function stdDev(vals) { if (!vals?.length) return 0; const mean = avg(vals), variance = avg(vals.map(v => (v - mean) ** 2)); return Math.sqrt(variance); }
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    async function fetchJsonWithFallback(url) {
+      let res;
+      try {
+        res = await fetch(url, { cache: "no-store" });
+      } catch (networkErr) {
+        throw new Error(`Network error for ${url}: ${networkErr.message}`);
+      }
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} for ${url}`);
+      }
+
+      const contentType = (res.headers.get("content-type") || "").toLowerCase();
+      if (!contentType.includes("application/json")) {
+        const body = await res.text();
+        throw new Error(
+          `Expected JSON from ${url}, got ${contentType || "unknown content-type"}; body starts with: ${body.slice(0, 120)}`
+        );
+      }
+
+      try {
+        return await res.json();
+      } catch (parseErr) {
+        throw new Error(`Invalid JSON from ${url}: ${parseErr.message}`);
+      }
+    }
+
+    function ema(vals, p) {
+      if (!vals?.length) return null;
+      const k = 2 / (p + 1);
+      let out = vals[0];
+      for (let i = 1; i < vals.length; i++) out = vals[i] * k + out * (1 - k);
+      return out;
+    }
+
+    function rsi(vals, p = 14) {
+      if (!vals || vals.length < p + 1) return 50;
+      let gains = 0, losses = 0;
+      for (let i = vals.length - p; i < vals.length; i++) {
+        const diff = vals[i] - vals[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses += Math.abs(diff);
+      }
+      if (losses === 0) return 100;
+      const rs = gains / losses;
+      return 100 - 100 / (1 + rs);
+    }
+
+    function macd(vals) {
+      if (!vals?.length) return { line: 0, signal: 0, hist: 0, bias: "neutral" };
+      const fast = ema(vals, 12) ?? 0;
+      const slow = ema(vals, 26) ?? 0;
+      const line = fast - slow;
+      const macdSeries = [];
+      for (let i = 0; i < vals.length; i++) {
+        const slice = vals.slice(0, i + 1);
+        macdSeries.push((ema(slice, 12) ?? 0) - (ema(slice, 26) ?? 0));
+      }
+      const signal = ema(macdSeries.slice(-9), 9) ?? 0;
+      const hist = line - signal;
+      return { line, signal, hist, bias: hist > 0 ? "bull" : hist < 0 ? "bear" : "neutral" };
+    }
+
+    function normalizeSymbol(v) {
+      return String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    }
+
+    function isStableOrPegged(symbol, name = "") {
+      const s = normalizeSymbol(symbol);
+      const n = String(name || "").toLowerCase();
+      if (STABLE_OR_PEGGED_SYMBOLS.has(s)) return true;
+      return /(usd|dollar|stable|eur|gold)/i.test(n);
+    }
+
+    function getSessionState() {
+      const now = new Date();
+      const day = now.getDay();
+      const weekend = day === 0 || day === 6;
+      return {
+        mode: weekend ? "weekend" : "weekday",
+        note: weekend ? "Half size · Limit orders" : "Normal size · Active",
+        clock: `CET ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+        isWeekend: weekend
+      };
+    }
+
+    function renderSessionBar() {
+      const s = getSessionState();
+      els.sessionBar.innerHTML = `<span>${s.clock}</span><span>${s.mode.toUpperCase()}</span><span>${s.note}</span>`;
+    }
+
+    function computeIndicators(row) {
+      const prices = row.sparkline_in_7d?.price?.filter(v => Number.isFinite(v)) || [row.current_price];
+      const current = row.current_price || prices[prices.length - 1] || 0;
+      const ema20 = ema(prices.slice(-40), 20) ?? current;
+      const ema50 = ema(prices.slice(-80), 50) ?? current;
+      const avgPrice = avg(prices);
+      const macdPack = macd(prices);
+      const rsi14 = rsi(prices, 14);
+      const sigma = stdDev(prices);
+      const atr14 = sigma * 1.6 || current * 0.02;
+      const atrPct = current ? (atr14 / current) * 100 : 0;
+      const vwap = avgPrice;
+      const vwapDeviationPct = current ? ((current - vwap) / vwap) * 100 : 0;
+      const recent = prices.slice(-12);
+      const support1 = Math.min(...recent);
+      const resistance1 = Math.max(...recent);
+      const support2 = support1 - atr14;
+      const resistance2 = resistance1 + atr14;
+      const priceChanges = [];
+      for (let i = 1; i < prices.length; i++) priceChanges.push(((prices[i] - prices[i - 1]) / prices[i - 1]) * 100);
+      const shortMomentum = avg(priceChanges.slice(-6));
+      const momentum5m = shortMomentum > 0.05 ? "bullish" : shortMomentum < -0.05 ? "bearish" : "flat";
+      const volumeRatio = clamp((row.total_volume || 0) / Math.max(row.market_cap || 1, 1) * 120, 0, 5);
+      const volumeQuality = volumeRatio >= 2 ? "high" : volumeRatio >= 0.9 ? "medium" : "low";
+      const spreadRiskPct = clamp(atrPct * 0.35, 0.05, 2.5);
+
+      return {
+        rsi14,
+        macdLine: macdPack.line,
+        macdSignal: macdPack.signal,
+        macdHist: macdPack.hist,
+        macdBias: macdPack.bias,
+        ema20,
+        ema50,
+        emaTrend: ema20 > ema50 ? "bull" : ema20 < ema50 ? "bear" : "neutral",
+        vwap,
+        vwapDeviationPct,
+        atr14,
+        atrPct,
+        support1,
+        support2,
+        resistance1,
+        resistance2,
+        trend1h: ema20 > ema50 ? "bull" : ema20 < ema50 ? "bear" : "range",
+        momentum5m,
+        volumeRatio,
+        volumeQuality,
+        spreadRiskPct
+      };
+    }
+
+    function calcTrendScore(market, indicators) {
+      const emaCross = indicators.ema20 > indicators.ema50 ? 1 : 0;
+      const aboveEma20 = market.price > indicators.ema20 ? 1 : 0;
+      const aboveVwap = market.price > indicators.vwap ? 1 : 0;
+      const trend7d = norm(market.change7dPct, -12, 12);
+      return score100(0.4 * emaCross + 0.2 * aboveEma20 + 0.2 * aboveVwap + 0.2 * trend7d);
+    }
+
+    function calcMomentumScore(market, indicators) {
+      const rsiSweet = clamp(1 - Math.abs(indicators.rsi14 - 60) / 22, 0, 1);
+      const macdNorm = norm(indicators.macdHist, -0.02, 0.02);
+      const chg1h = norm(market.change1hPct, -3, 3);
+      const chg24 = norm(market.change24hPct, -8, 8);
+      return score100(0.35 * rsiSweet + 0.35 * macdNorm + 0.15 * chg1h + 0.15 * chg24);
+    }
+
+    function calcPullbackScore(market, indicators, scores) {
+      const bullishContext = scores.trendScore >= 65 ? 1 : 0;
+      const vwapRetest = 1 - norm(Math.abs(indicators.vwapDeviationPct), 0, 2.8);
+      const rsiCooldown = clamp(1 - Math.abs(indicators.rsi14 - 43) / 14, 0, 1);
+      const supportDistPct = Math.abs((market.price - indicators.support1) / market.price) * 100;
+      const supportProximity = 1 - norm(supportDistPct, 0, 2.5);
+      return score100(0.4 * bullishContext + 0.25 * vwapRetest + 0.2 * rsiCooldown + 0.15 * supportProximity);
+    }
+
+    function calcBreakoutScore(market, indicators, scores) {
+      const aboveR1 = market.price > indicators.resistance1 * 0.997 ? 1 : 0;
+      const macdPos = indicators.macdHist > 0 ? 1 : 0;
+      const rsiReady = indicators.rsi14 >= 58 && indicators.rsi14 <= 76 ? 1 : 0;
+      const volExpand = norm(indicators.volumeRatio, 0.7, 2.4);
+      const trendOk = scores.trendScore > 60 ? 1 : 0;
+      return score100(0.3 * aboveR1 + 0.25 * macdPos + 0.2 * rsiReady + 0.15 * volExpand + 0.1 * trendOk);
+    }
+
+    function calcBearScore(market, indicators) {
+      const emaCrossDown = indicators.ema20 < indicators.ema50 ? 1 : 0;
+      const belowEma20 = market.price < indicators.ema20 ? 1 : 0;
+      const belowVwap = market.price < indicators.vwap ? 1 : 0;
+      const negTrend7d = norm(-market.change7dPct, -12, 12);
+      return score100(0.4 * emaCrossDown + 0.2 * belowEma20 + 0.2 * belowVwap + 0.2 * negTrend7d);
+    }
+
+    function calcLiquidityScore(market) {
+      return score100(norm(market.volume24hUsd, 1e6, 3e9));
+    }
+
+    function calcRiskScore(indicators, session) {
+      const atrRisk = norm(indicators.atrPct, 0.4, 10);
+      const spreadRisk = norm(indicators.spreadRiskPct, 0.05, 1.5);
+      const weekendPenalty = session.isWeekend ? 0.15 : 0;
+      return score100(0.55 * atrRisk + 0.3 * spreadRisk + 0.15 * weekendPenalty);
+    }
+
+    function calcConfidenceScore(scores) {
+      return score100(
+        0.3 * (scores.trendScore / 100) +
+        0.25 * (scores.momentumScore / 100) +
+        0.2 * (Math.max(scores.pullbackScore, scores.breakoutScore) / 100) +
+        0.15 * (scores.liquidityScore / 100) +
+        0.1 * (1 - scores.riskScore / 100)
+      );
+    }
+
+    function calcWinProbability(scores) {
+      return score100(
+        0.35 * (scores.trendScore / 100) +
+        0.25 * (scores.momentumScore / 100) +
+        0.2 * (Math.max(scores.pullbackScore, scores.breakoutScore) / 100) +
+        0.1 * (scores.liquidityScore / 100) +
+        0.1 * (1 - scores.riskScore / 100)
+      );
+    }
+
+    function calcRankScore(scores) {
+      return Number((
+        0.3 * scores.trendScore +
+        0.25 * scores.momentumScore +
+        0.2 * Math.max(scores.pullbackScore, scores.breakoutScore) +
+        0.15 * scores.liquidityScore -
+        0.1 * scores.riskScore
+      ).toFixed(1));
+    }
+
+    function classifyToken(token, market, indicators, scores, session) {
+      let marketState = "range", actionState = "hold", setupType = "range", bias = "neutral";
+      const reasons = [];
+
+      if (scores.breakoutScore >= 75 && scores.trendScore >= 60) {
+        marketState = "breakout"; actionState = "buy"; setupType = "breakout"; bias = "bull";
+        reasons.push("breakout_score_high", "trend_confirmed");
+      } else if (scores.pullbackScore >= 70 && scores.trendScore >= 65) {
+        marketState = "pullback"; actionState = "watch"; setupType = "pullback"; bias = "bull";
+        reasons.push("bull_context", "pullback_quality_high");
+      } else if (scores.trendScore >= 70 && scores.momentumScore >= 60) {
+        marketState = "bull"; actionState = "buy"; setupType = "continuation"; bias = "bull";
+        reasons.push("trend_strong", "momentum_confirmed");
+      } else if (scores.bearScore >= 70 && indicators.macdBias === "bear") {
+        marketState = "bear"; actionState = "sell"; setupType = "continuation"; bias = "bear";
+        reasons.push("bear_trend", "macd_negative");
+      } else if (indicators.rsi14 >= 75 && indicators.vwapDeviationPct > 2.2) {
+        marketState = "exhaustion"; actionState = "watch"; setupType = "reversal"; bias = "bull";
+        reasons.push("overextended", "far_above_vwap");
+      } else {
+        marketState = "range"; actionState = "hold"; setupType = "range";
+        bias = indicators.emaTrend === "bull" ? "bull" : indicators.emaTrend === "bear" ? "bear" : "neutral";
+        reasons.push("no_clear_edge");
+      }
+
+      if (session.isWeekend && actionState === "buy") {
+        actionState = "watch";
+        reasons.push("weekend_downgrade");
+      }
+
+      if (isStableOrPegged(token.symbol, token.name)) {
+        if (actionState === "buy") actionState = "watch";
+        if (marketState === "breakout") marketState = "range";
+        reasons.push("stable_asset_suppressed");
+      }
+
+      const confidenceLabel = scores.confidenceScore >= 75 ? "high" : scores.confidenceScore >= 50 ? "medium" : "low";
+      const riskLabel = scores.riskScore >= 67 ? "high" : scores.riskScore >= 34 ? "medium" : "low";
+
+      const patternMap = {
+        breakout: { code: "B2", name: "Breakout Continuation" },
+        pullback: { code: "PB1", name: "Bull Pullback" },
+        continuation: { code: bias === "bull" ? "C1" : "C2", name: bias === "bull" ? "Bull Continuation" : "Bear Continuation" },
+        reversal: { code: "R1", name: "Exhaustion Reversal" },
+        range: { code: "RG", name: "Range Hold" }
+      };
+
+      const pattern = patternMap[setupType] || { code: "NA", name: "No Pattern" };
+
+      return {
+        marketState,
+        actionState,
+        setupType,
+        bias,
+        signalLabel: actionState.toUpperCase(),
+        signalPriority: { buy: 1, sell: 2, watch: 3, hold: 4 }[actionState] ?? 9,
+        patternCode: pattern.code,
+        patternName: pattern.name,
+        confidenceLabel,
+        riskLabel,
+        statusReason: reasons
+      };
+    }
+
+    function buildExecutionPlan(market, indicators, classification, session) {
+      const atr = indicators.atr14 || market.price * 0.02;
+      const riskPct = session.isWeekend ? 0.35 : 0.75;
+      let entry, stop, tp1, tp2, tp3;
+
+      if (classification.setupType === "breakout") {
+        entry = indicators.resistance1; stop = entry - atr * 1.2; tp1 = entry + atr * 1; tp2 = entry + atr * 2; tp3 = entry + atr * 3;
+      } else if (classification.setupType === "pullback") {
+        entry = Math.max(indicators.vwap, indicators.support1); stop = entry - atr * 1; tp1 = entry + atr * 1.2; tp2 = entry + atr * 2.2; tp3 = entry + atr * 3;
+      } else if (classification.actionState === "sell") {
+        entry = Math.min(indicators.vwap, indicators.support1); stop = entry + atr * 1.2; tp1 = entry - atr * 1; tp2 = entry - atr * 2; tp3 = entry - atr * 3;
+      } else {
+        entry = market.price; stop = market.price - atr; tp1 = market.price + atr; tp2 = market.price + atr * 2; tp3 = market.price + atr * 3;
+      }
+
+      const riskReward = Math.abs(tp1 - entry) / Math.max(Math.abs(entry - stop), 0.00000001);
+
+      return {
+        entry,
+        stop,
+        takeProfit1: tp1,
+        takeProfit2: tp2,
+        takeProfit3: tp3,
+        riskReward: Number(riskReward.toFixed(2)),
+        holdWindowMin: 15,
+        holdWindowMax: 60,
+        timeStopBars: 10,
+        riskPct,
+        trailRule: "ema20_or_atr_1_5",
+        addonRule: "vwap_bounce_and_rsi_gt_55",
+        invalidationRule: "vwap_and_ema20_reversal"
+      };
+    }
+
+    async function fetchMarketRows() {
+      const all = [];
+      const proxyBase = API_PROXY_BASE.replace(/\/$/, "");
+
+      for (let page = 1; page <= SCAN_PAGES; page++) {
+        const url =
+          `${proxyBase}/coingecko/coins/markets?vs_currency=${encodeURIComponent(BASE_CURRENCY)}` +
+          `&order=market_cap_desc&sparkline=true&price_change_percentage=1h,24h,7d,30d` +
+          `&per_page=${SCAN_PER_PAGE}&page=${page}`;
+
+        const rows = await fetchJsonWithFallback(url);
+        if (!Array.isArray(rows) || !rows.length) break;
+
+        all.push(...rows);
+
+        if (rows.length < SCAN_PER_PAGE) break;
+        if (page < SCAN_PAGES) await sleep(350);
+      }
+
+      return all;
+    }
+
+    function buildAnalyses(rows) {
+      const session = getSessionState();
+      const analyses = [];
+      const missing = [];
+      const dedupe = new Set();
+
+      for (const row of rows) {
+        if (!row?.id || !row?.symbol || !row?.name || !Number.isFinite(row?.current_price)) continue;
+        if (dedupe.has(row.id)) continue;
+        dedupe.add(row.id);
+        if ((row.total_volume ?? 0) < MIN_VOLUME_USD) continue;
+
+        const assetMeta = REVOLUT_X_ASSETS.get(row.id);
+        if (!assetMeta) continue;
+
+        const symbol = assetMeta.symbol || normalizeSymbol(row.symbol);
+
+        const token = {
+          symbol,
+          name: row.name,
+          cgId: row.id,
+          tvSymbol: assetMeta.tv || null,
+          color: "#4f8cff",
+          sector: isStableOrPegged(symbol, row.name) ? "stable" : "market"
+        };
+
+        const market = {
+          tokenId: token.symbol.toLowerCase(),
+          asOf: new Date().toISOString(),
+          source: "CoinGecko",
+          price: row.current_price,
+          change1hPct: row.price_change_percentage_1h_in_currency ?? 0,
+          change24hPct: row.price_change_percentage_24h_in_currency ?? 0,
+          change7dPct: row.price_change_percentage_7d_in_currency ?? 0,
+          change30dPct: row.price_change_percentage_30d_in_currency ?? 0,
+          volume24hUsd: row.total_volume ?? 0,
+          marketCapUsd: row.market_cap ?? 0,
+          dataQuality: "live",
+          isStale: false
+        };
+
+        const indicators = computeIndicators(row);
+        const scores = {
+          trendScore: calcTrendScore(market, indicators),
+          momentumScore: calcMomentumScore(market, indicators),
+          pullbackScore: 0,
+          breakoutScore: 0,
+          bearScore: calcBearScore(market, indicators),
+          liquidityScore: calcLiquidityScore(market),
+          riskScore: 0,
+          confidenceScore: 0,
+          winProbabilityPct: 0,
+          rankScore: 0
+        };
+
+        scores.pullbackScore = calcPullbackScore(market, indicators, scores);
+        scores.breakoutScore = calcBreakoutScore(market, indicators, scores);
+        scores.riskScore = calcRiskScore(indicators, session);
+        scores.confidenceScore = calcConfidenceScore(scores);
+        scores.winProbabilityPct = calcWinProbability(scores);
+        scores.rankScore = calcRankScore(scores);
+
+        const classification = classifyToken(token, market, indicators, scores, session);
+        const execution = buildExecutionPlan(market, indicators, classification, session);
+
+        analyses.push({ token, market, indicators, scores, classification, execution });
+      }
+
+      analyses.sort((a, b) => getBuyPriorityScore(b) - getBuyPriorityScore(a));
+      return { analyses, missing };
+    }
+
+    function getBuyPriorityScore(item) {
+      const signalBoost =
+        item.classification.actionState === "buy" ? 40 :
+        item.classification.actionState === "watch" ? 18 :
+        item.classification.actionState === "hold" ? 4 : -20;
+
+      const stateBoost =
+        item.classification.marketState === "pullback" ? 18 :
+        item.classification.marketState === "bull" ? 14 :
+        item.classification.marketState === "breakout" ? 8 :
+        item.classification.marketState === "range" ? -4 :
+        item.classification.marketState === "exhaustion" ? -14 :
+        item.classification.marketState === "bear" ? -24 : 0;
+
+      const rsi = Number(item.indicators.rsi14 || 50);
+      const rsiBoost =
+        rsi >= 42 && rsi <= 58 ? 18 :
+        rsi >= 35 && rsi < 42 ? 12 :
+        rsi > 58 && rsi <= 65 ? 6 :
+        rsi >= 25 && rsi < 35 ? 4 :
+        rsi > 65 && rsi <= 75 ? -10 :
+        -18;
+
+      const trendBoost = Number(item.scores.trendScore || 0) * 0.22;
+
+      const move24h = Number(item.market.change24hPct || 0);
+      const momentumBoost =
+        move24h >= 0 && move24h <= 4 ? 10 :
+        move24h > 4 && move24h <= 8 ? 6 :
+        move24h > 8 && move24h <= 15 ? -2 :
+        move24h > 15 ? -12 :
+        move24h >= -3 ? 6 :
+        move24h >= -6 ? 2 : -8;
+
+      const volumeBoost =
+        item.indicators.volumeQuality === "high" ? 10 :
+        item.indicators.volumeQuality === "medium" ? 5 :
+        item.indicators.volumeQuality === "low" ? -6 : 0;
+
+      const stablePenalty = isStableOrPegged(item.token.symbol, item.token.name) ? 80 : 0;
+      const rawScoreBoost = Number(item.scores.rankScore || 0) * 0.35;
+
+      return signalBoost + stateBoost + rsiBoost + trendBoost + momentumBoost + volumeBoost + rawScoreBoost - stablePenalty;
+    }
+
+    function getFilteredAnalyses() {
+      let list = [...st.analyses];
+      const signal = els.signalFilter.value;
+      const marketState = els.stateFilter.value;
+      const q = els.searchInput.value.trim().toLowerCase();
+      const sortBy = els.sortBy.value;
+
+      if (signal !== "all") list = list.filter(x => x.classification.actionState === signal);
+      if (marketState !== "all") list = list.filter(x => x.classification.marketState === marketState);
+      if (q) {
+        list = list.filter(x =>
+          [x.token.symbol, x.token.name, x.classification.marketState, x.classification.actionState, x.classification.setupType, x.classification.patternName]
+            .join(" ")
+            .toLowerCase()
+            .includes(q)
+        );
+      }
+
+      list.sort((a, b) => {
+        switch (sortBy) {
+          case "bestbuy": {
+            const diff = getBuyPriorityScore(b) - getBuyPriorityScore(a);
+            if (diff !== 0) return diff;
+            const trendDiff = Number(b.scores.trendScore || 0) - Number(a.scores.trendScore || 0);
+            if (trendDiff !== 0) return trendDiff;
+            const rsiCenterA = Math.abs((Number(a.indicators.rsi14 || 50)) - 50);
+            const rsiCenterB = Math.abs((Number(b.indicators.rsi14 || 50)) - 50);
+            return rsiCenterA - rsiCenterB;
+          }
+          case "change24":
+            return b.market.change24hPct - a.market.change24hPct;
+          case "volume":
+            return b.market.volume24hUsd - a.market.volume24hUsd;
+          case "symbol":
+            return a.token.symbol.localeCompare(b.token.symbol);
+          default:
+            return b.scores.rankScore - a.scores.rankScore;
+        }
+      });
+
+      return list;
+    }
+
+    function kv(label, value) {
+      return `<div class="kv"><div class="k">${label}</div><div class="v">${value}</div></div>`;
+    }
+
+    function barRow(label, value) {
+      const color = value >= 70 ? "var(--green)" : value >= 50 ? "var(--amber)" : "var(--blue)";
+      return `<div class="bar-row"><div class="bar-label">${label}</div><div class="bar"><span style="width:${clamp(value,0,100)}%;background:${color}"></span></div><div class="bar-value">${value}</div></div>`;
+    }
+
+    function renderTokenList() {
+      st.filtered = getFilteredAnalyses();
+
+      if (!st.filtered.length) {
+        els.tokenList.innerHTML = '<div class="panel"><div class="sub">No Revolut X tokens match the current filters.</div></div>';
+        return;
+      }
+
+      els.tokenList.innerHTML = st.filtered.map(item => {
+        const isActive = st.selectedId === item.token.cgId;
+        const c = item.classification;
+        const i = item.indicators;
+        const m = item.market;
+        const stableMark = isStableOrPegged(item.token.symbol, item.token.name) ? '<span class="pill hold">PEGGED</span>' : '';
+        const tvUrl = item.token.tvSymbol ? `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(item.token.tvSymbol)}` : null;
+
+        return `<article class="card ${isActive ? "active" : ""}" data-token="${item.token.cgId}">
+          <div class="row">
+            <div>
+              <div class="symbol">${item.token.symbol}/USD</div>
+              <div class="name">${item.token.name}</div>
+              <div style="margin-top:8px">${tvUrl ? `<a class="btn" href="${tvUrl}" target="_blank" rel="noopener noreferrer">TradingView</a>` : ""}</div>
+            </div>
+            <div>
+              <div class="price">${fmt.usd(m.price)}</div>
+              <div class="change ${m.change24hPct >= 0 ? "g" : "r"}">${fmt.pct(m.change24hPct)}</div>
+            </div>
+          </div>
+          <div class="pills">
+            <span class="pill ${c.actionState}">${c.signalLabel}</span>
+            <span class="pill state">${c.marketState}</span>
+            <span class="pill setup">${c.setupType}</span>
+            ${stableMark}
+          </div>
+          <div class="mini-grid">
+            <div class="mini"><div class="k">Score</div><div class="v">${fmt.num(item.scores.rankScore,1)}</div></div>
+            <div class="mini"><div class="k">Buy now</div><div class="v">${fmt.num(getBuyPriorityScore(item),1)}</div></div>
+            <div class="mini"><div class="k">RSI</div><div class="v">${fmt.num(i.rsi14,1)}</div></div>
+            <div class="mini"><div class="k">Trend</div><div class="v">${item.scores.trendScore}</div></div>
+          </div>
+        </article>`;
+      }).join("");
+
+      [...els.tokenList.querySelectorAll(".card")].forEach(card =>
+        card.addEventListener("click", () => {
+          st.selectedId = card.dataset.token;
+          renderAll();
+        })
+      );
+    }
+
+    function renderDetail() {
+      const selected = st.analyses.find(x => x.token.cgId === st.selectedId) || st.filtered[0] || st.analyses[0];
+      if (!selected) {
+        els.detailPane.innerHTML = '<div class="panel"><div class="sub">No token selected.</div></div>';
+        return;
+      }
+
+      st.selectedId = selected.token.cgId;
+      const { token, market, indicators, scores, classification, execution } = selected;
+
+      els.detailPane.innerHTML = `
+        <div class="panel">
+          <div class="pills" style="margin-bottom:8px">
+            <span class="pill ${classification.actionState}">${classification.signalLabel}</span>
+            <span class="pill state">${classification.marketState}</span>
+            <span class="pill setup">${classification.patternCode} · ${classification.setupType}</span>
+          </div>
+          <div class="symbol">${token.symbol}/USD</div>
+          <div class="name">${token.name}</div>
+          <div class="detail-price">${fmt.usd(market.price)}</div>
+          <div class="change ${market.change24hPct >= 0 ? "g" : "r"}">${fmt.pct(market.change24hPct)} · 24h</div>
+          <div class="grid2" style="margin-top:10px">
+            <div class="kv"><div class="k">Win prob</div><div class="v">${scores.winProbabilityPct}%</div></div>
+            <div class="kv"><div class="k">Buy-now rank</div><div class="v">${fmt.num(getBuyPriorityScore(selected),1)}</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Score engine</h3>
+          <div class="bar-wrap">
+            ${barRow("Trend", scores.trendScore)}
+            ${barRow("Momentum", scores.momentumScore)}
+            ${barRow("Pullback", scores.pullbackScore)}
+            ${barRow("Breakout", scores.breakoutScore)}
+            ${barRow("Bear", scores.bearScore)}
+            ${barRow("Liquidity", scores.liquidityScore)}
+            ${barRow("Risk", scores.riskScore)}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Indicators</h3>
+          <div class="grid4">
+            ${kv("RSI 14", fmt.num(indicators.rsi14,1))}
+            ${kv("MACD bias", indicators.macdBias)}
+            ${kv("EMA trend", indicators.emaTrend)}
+            ${kv("Momentum 5m", indicators.momentum5m)}
+            ${kv("EMA20", fmt.usd(indicators.ema20))}
+            ${kv("EMA50", fmt.usd(indicators.ema50))}
+            ${kv("VWAP", fmt.usd(indicators.vwap))}
+            ${kv("VWAP dev", fmt.pct(indicators.vwapDeviationPct))}
+            ${kv("ATR 14", fmt.usd(indicators.atr14))}
+            ${kv("ATR %", fmt.pct(indicators.atrPct))}
+            ${kv("S1", fmt.usd(indicators.support1))}
+            ${kv("R1", fmt.usd(indicators.resistance1))}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Execution plan</h3>
+          <div class="grid3">
+            ${kv("Entry", fmt.usd(execution.entry))}
+            ${kv("Stop", fmt.usd(execution.stop))}
+            ${kv("R:R", fmt.num(execution.riskReward,2))}
+            ${kv("TP1", fmt.usd(execution.takeProfit1))}
+            ${kv("TP2", fmt.usd(execution.takeProfit2))}
+            ${kv("TP3", fmt.usd(execution.takeProfit3))}
+            ${kv("Hold window", `${execution.holdWindowMin}-${execution.holdWindowMax}m`)}
+            ${kv("Time stop", `${execution.timeStopBars} bars`)}
+            ${kv("Risk", `${execution.riskPct}%`)}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Market snapshot</h3>
+          <div class="tbl">
+            <div class="tbl-row"><div class="label">1h change</div><div class="value ${market.change1hPct >= 0 ? "g" : "r"}">${fmt.pct(market.change1hPct)}</div></div>
+            <div class="tbl-row"><div class="label">24h change</div><div class="value ${market.change24hPct >= 0 ? "g" : "r"}">${fmt.pct(market.change24hPct)}</div></div>
+            <div class="tbl-row"><div class="label">7d change</div><div class="value ${market.change7dPct >= 0 ? "g" : "r"}">${fmt.pct(market.change7dPct)}</div></div>
+            <div class="tbl-row"><div class="label">24h volume</div><div class="value">${fmt.compact(market.volume24hUsd)}</div></div>
+            <div class="tbl-row"><div class="label">Market cap</div><div class="value">${fmt.compact(market.marketCapUsd)}</div></div>
+            <div class="tbl-row"><div class="label">Updated</div><div class="value">${fmt.dateTime(st.lastUpdated)}</div></div>
+          </div>
+        </div>`;
+    }
+
+    function summarize() {
+      const summary = {
+        configured: st.analyses.length,
+        scanned: st.analyses.length,
+        missing: st.missing.length,
+        actionCounts: { buy: 0, sell: 0, watch: 0, hold: 0 },
+        marketCounts: { bull: 0, bear: 0, pullback: 0, breakout: 0, range: 0, exhaustion: 0 },
+        avgRsi: 0,
+        avg24: 0,
+        pctAboveEma20: 0,
+        pctAboveVwap: 0
+      };
+
+      if (!st.analyses.length) return summary;
+
+      let aboveEma = 0, aboveVwap = 0, rsiSum = 0, avg24Sum = 0;
+      st.analyses.forEach(x => {
+        summary.actionCounts[x.classification.actionState] = (summary.actionCounts[x.classification.actionState] || 0) + 1;
+        summary.marketCounts[x.classification.marketState] = (summary.marketCounts[x.classification.marketState] || 0) + 1;
+        rsiSum += x.indicators.rsi14;
+        avg24Sum += x.market.change24hPct;
+        if (x.market.price > x.indicators.ema20) aboveEma++;
+        if (x.market.price > x.indicators.vwap) aboveVwap++;
+      });
+
+      summary.avgRsi = rsiSum / st.analyses.length;
+      summary.avg24 = avg24Sum / st.analyses.length;
+      summary.pctAboveEma20 = (aboveEma / st.analyses.length) * 100;
+      summary.pctAboveVwap = (aboveVwap / st.analyses.length) * 100;
+
+      return summary;
+    }
+
+    function renderOpportunityLists() {
+      const top = (arr, n = 6) => arr.slice(0, n);
+
+      const buyNow = top(
+        st.analyses
+          .filter(x => !isStableOrPegged(x.token.symbol, x.token.name))
+          .sort((a, b) => getBuyPriorityScore(b) - getBuyPriorityScore(a))
+      );
+
+      const breakouts = top(
+        st.analyses.filter(x => x.classification.marketState === "breakout" && !isStableOrPegged(x.token.symbol, x.token.name))
+          .sort((a, b) => b.scores.breakoutScore - a.scores.breakoutScore)
+      );
+
+      const pullbacks = top(
+        st.analyses.filter(x => x.classification.marketState === "pullback" && !isStableOrPegged(x.token.symbol, x.token.name))
+          .sort((a, b) => b.scores.pullbackScore - a.scores.pullbackScore)
+      );
+
+      const bulls = top(
+        st.analyses.filter(x => x.classification.bias === "bull" && !isStableOrPegged(x.token.symbol, x.token.name))
+          .sort((a, b) => b.scores.trendScore - a.scores.trendScore)
+      );
+
+      const bears = top(
+        st.analyses.filter(x => x.classification.marketState === "bear")
+          .sort((a, b) => b.scores.bearScore - a.scores.bearScore)
+      );
+
+      const renderRankList = (items, scoreKey, mode = "score") => {
+        if (!items.length) return '<div class="sub">No setups in this category right now.</div>';
+        return items.map((x, idx) => `
+          <div class="rank-item">
+            <div class="rank-num">${idx + 1}</div>
+            <div>
+              <div class="symbol" style="font-size:14px">${x.token.symbol}/USD</div>
+              <div class="sub" style="font-size:11px">${x.token.name} · ${x.classification.patternName}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="value" style="font-family:var(--mono)">
+                ${mode === "buy" ? fmt.num(getBuyPriorityScore(x), 1) : x.scores[scoreKey]}
+              </div>
+              <div class="sub ${x.market.change24hPct >= 0 ? "g" : "r"}" style="font-size:11px">${fmt.pct(x.market.change24hPct)}</div>
+            </div>
+          </div>
+        `).join("");
+      };
+
+      els.breakoutList.innerHTML = renderRankList(breakouts, "breakoutScore");
+      els.pullbackList.innerHTML = renderRankList(pullbacks, "pullbackScore");
+      els.bullList.innerHTML = renderRankList(buyNow, "rankScore", "buy");
+      els.bearList.innerHTML = renderRankList(bears, "bearScore");
+    }
+
+    function renderSummary() {
+      const s = summarize();
+      const session = getSessionState();
+
+      els.buyCount.textContent = s.actionCounts.buy;
+      els.sellCount.textContent = s.actionCounts.sell;
+      els.watchCount.textContent = s.actionCounts.watch;
+      els.holdCount.textContent = s.actionCounts.hold;
+      els.scannedCount.textContent = s.scanned;
+
+      els.ovConfigured.textContent = s.configured;
+      els.ovScanned.textContent = s.scanned;
+      els.ovMissing.textContent = s.missing;
+      els.ovUpdated.textContent = fmt.time(st.lastUpdated);
+      els.ovSession.textContent = session.mode.toUpperCase();
+      els.ovAvgRsi.textContent = fmt.num(s.avgRsi, 1);
+      els.ovAvg24.textContent = fmt.pct(s.avg24, 2);
+      els.ovAboveEma.textContent = fmt.pct(s.pctAboveEma20, 1);
+      els.ovAboveVwap.textContent = fmt.pct(s.pctAboveVwap, 1);
+
+      els.breadthBars.innerHTML =
+        `${barRow("Above EMA20", Number(s.pctAboveEma20.toFixed(1)))}${barRow("Above VWAP", Number(s.pctAboveVwap.toFixed(1)))}${barRow("Avg RSI", Number(s.avgRsi.toFixed(1)))}${barRow("Buy ratio", Number(((s.actionCounts.buy / Math.max(1, s.scanned)) * 100).toFixed(1)))}`;
+
+      els.stateStats.innerHTML = [
+        ["bull", s.marketCounts.bull],
+        ["breakout", s.marketCounts.breakout],
+        ["pullback", s.marketCounts.pullback],
+        ["bear", s.marketCounts.bear],
+        ["range", s.marketCounts.range],
+        ["exhaustion", s.marketCounts.exhaustion]
+      ].map(([label, value]) => kv(label, value)).join("");
+
+      els.actionStats.innerHTML = [
+        ["buy", s.actionCounts.buy],
+        ["sell", s.actionCounts.sell],
+        ["watch", s.actionCounts.watch],
+        ["hold", s.actionCounts.hold]
+      ].map(([label, value]) => kv(label, value)).join("");
+
+      renderOpportunityLists();
+
+      els.healthConfigured.textContent = s.configured;
+      els.healthScanned.textContent = s.scanned;
+      els.healthMissing.textContent = s.missing;
+      els.healthQuality.textContent = st.apiErrors ? "degraded" : "live";
+      els.missingText.textContent = `Scanning paginated live CoinGecko rows, filtered to Revolut X assets by CoinGecko ID, minimum 24h volume ${fmt.compact(MIN_VOLUME_USD)}.`;
+    }
+
+    function setFooter(message) {
+      els.footerText.textContent = message;
+    }
+
+    function renderAll() {
+      renderSessionBar();
+      renderTokenList();
+      renderDetail();
+      renderSummary();
+      els.liveText.textContent = `LIVE · Revolut X filtered scan · ${fmt.time(st.lastUpdated)}`;
+      setFooter(`v${APP_VERSION} · ${st.analyses.length} Revolut X tokens scanned · updated ${fmt.dateTime(st.lastUpdated)}`);
+    }
+
+    async function refreshData() {
+      if (st.refreshInFlight) return;
+      st.refreshInFlight = true;
+      els.refreshBtn.textContent = "Refreshing...";
+      els.liveText.textContent = `LIVE · Revolut X filtered scan · --:--`;
+      setFooter("Refreshing live Revolut X market data...");
+
+      try {
+        const rows = await fetchMarketRows();
+        const { analyses, missing } = buildAnalyses(rows);
+        st.analyses = analyses;
+        st.missing = missing;
+        st.lastUpdated = Date.now();
+        if (!st.selectedId && analyses.length) st.selectedId = analyses[0].token.cgId;
+        renderAll();
+        setFooter(`Fetched ${rows.length} rows · analyses ${analyses.length} · missing ${missing.length}`);
+      } catch (err) {
+        st.apiErrors += 1;
+        els.liveText.textContent = `ERROR · Revolut X filtered scan · --:--`;
+        setFooter(`Refresh failed: ${err.message}`);
+        console.error(err);
+      } finally {
+        st.refreshInFlight = false;
+        els.refreshBtn.textContent = "Refresh";
+      }
+    }
+
+    function bindEvents() {
+      els.tabs.forEach(tab => tab.addEventListener("click", () => {
+        els.tabs.forEach(t => t.classList.remove("active"));
+        els.views.forEach(v => v.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(tab.dataset.view).classList.add("active");
+      }));
+
+      [els.signalFilter, els.stateFilter, els.sortBy].forEach(el => el.addEventListener("change", renderAll));
+      els.searchInput.addEventListener("input", renderAll);
+      els.refreshBtn.addEventListener("click", refreshData);
+    }
+
+    bindEvents();
+    renderSessionBar();
+    refreshData();
+    setInterval(refreshData, REFRESH_MS);
+  </script>
+</body>
+</html>
