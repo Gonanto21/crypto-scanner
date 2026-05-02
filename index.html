@@ -832,7 +832,7 @@
 
     async function fetchMarketRows() {
       const all = [];
-      const proxyBase = https://crypto-scanner-proxy.apmg21.workers.dev.replace(/\/$/, "");
+      const API_PROXY_BASE = "https://crypto-scanner-proxy.apmg21.workers.dev";     const proxyBase = API_PROXY_BASE.replace(/\/$/, "");
 
       for (let page = 1; page <= SCAN_PAGES; page++) {
         const url =
