@@ -2,652 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-  />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revolut X · Pro Scanner v5 · LIVE</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
-
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --bg2: #111118;
-      --bg3: #171722;
-      --bg4: #202032;
-      --bg5: #27273b;
-      --border: #2a2a3a;
-      --border2: #3a3a53;
-      --text: #edf0f6;
-      --text2: #9ea4bb;
-      --text3: #616781;
-      --green: #00e676;
-      --red: #ff4569;
-      --amber: #ffb300;
-      --blue: #4f8cff;
-      --purple: #8e6cff;
-      --cyan: #00d5ff;
-      --accent: #1c268f;
-      --buy-bg: rgba(0, 230, 118, 0.12);
-      --sell-bg: rgba(255, 69, 105, 0.12);
-      --watch-bg: rgba(255, 179, 0, 0.12);
-      --hold-bg: rgba(79, 140, 255, 0.12);
-      --radius: 12px;
-      --radius-sm: 8px;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    :root{
+      --bg:#0b0d12;--panel:#141925;--panel2:#1b2231;--border:#2a3347;
+      --text:#eef3ff;--muted:#9aa6c7;--green:#00e676;--red:#ff4569;
+      --amber:#ffb300;--blue:#4f8cff
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .title{font-size:24px;font-weight:700}
+    .sub{color:var(--muted);font-size:14px;margin-top:6px}
+    .btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .card,.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+    .k{color:var(--muted);font-size:12px;text-transform:uppercase;margin-bottom:8px}
+    .v{font-size:26px;font-weight:700}
+    .g{color:var(--green)} .r{color:var(--red)} .a{color:var(--amber)} .b{color:var(--blue)}
+    .layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .list{display:grid;gap:10px}
+    .token{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}
+    .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .symbol{font-weight:700;font-size:16px}
+    .name{color:var(--muted);font-size:13px;margin-top:4px}
+    .price{font-weight:700}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-top:8px}
+    .buy{background:rgba(0,230,118,.12);color:var(--green)}
+    .sell{background:rgba(255,69,105,.12);color:var(--red)}
+    .watch{background:rgba(255,179,0,.12);color:var(--amber)}
+    .hold{background:rgba(79,140,255,.12);color:var(--blue)}
+    .detailgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .mini{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px}
+    .mini .k{margin-bottom:4px}
+    .foot{margin-top:16px;color:var(--muted);font-size:12px}
+    @media (max-width:900px){.layout,.grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:700px){.layout,.grid,.detailgrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">Revolut X · Pro Scanner v5 · LIVE</div>
+        <div class="sub" id="status">Loading live market data...</div>
+      </div>
+      <button class="btn" id="refreshBtn">Refresh</button>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="k">Buy</div><div class="v g" id="buyCount">0</div></div>
+      <div class="card"><div class="k">Sell</div><div class="v r" id="sellCount">0</div></div>
+      <div class="card"><div class="k">Watch</div><div class="v a" id="watchCount">0</div></div>
+      <div class="card"><div class="k">Hold</div><div class="v b" id="holdCount">0</div></div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <div class="k">Scanner</div>
+        <div class="list" id="tokenList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="k">Selected token</div>
+        <div id="detail"></div>
+      </div>
+    </div>
+
+    <div class="foot" id="foot">Waiting for data...</div>
+  </div>
+
+  <script>
+    const TOKENS = [
+      { symbol:"BTC", name:"Bitcoin", id:"bitcoin" },
+      { symbol:"ETH", name:"Ethereum", id:"ethereum" },
+      { symbol:"XRP", name:"XRP", id:"ripple" },
+      { symbol:"SOL", name:"Solana", id:"solana" },
+      { symbol:"DOGE", name:"Dogecoin", id:"dogecoin" },
+      { symbol:"ADA", name:"Cardano", id:"cardano" },
+      { symbol:"LINK", name:"Chainlink", id:"chainlink" },
+      { symbol:"AVAX", name:"Avalanche", id:"avalanche-2" },
+      { symbol:"SUI", name:"Sui", id:"sui" },
+      { symbol:"PEPE", name:"Pepe", id:"pepe" },
+      { symbol:"BONK", name:"Bonk", id:"bonk" },
+      { symbol:"PENGU", name:"Pudgy Penguins", id:"pudgy-penguins" }
+    ];
+
+    let DATA = [];
+    let SELECTED = null;
+
+    function usd(v){
+      if(v >= 1) return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:4}).format(v);
+      return '$' + Number(v).toFixed(8).replace(/0+$/,'').replace(/\.$/,'');
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
+    function pct(v){
+      const n = Number(v || 0);
+      return `${n > 0 ? '+' : ''}${n.toFixed(2)}%`;
     }
 
-    html {
-      scroll-behavior: smooth;
+    function classify(t){
+      if ((t.change24hPct > 3 && t.change7dPct > 5) || (t.change24hPct > 1.5 && t.change1hPct > 0.4)) return 'buy';
+      if (t.change24hPct < -3 || (t.change1hPct < -1 && t.change7dPct < 0)) return 'sell';
+      if (Math.abs(t.change24hPct) < 1.2) return 'hold';
+      return 'watch';
     }
 
-    body {
-      background: linear-gradient(180deg, #0a0a0f 0%, #0c0d14 100%);
-      color: var(--text);
-      font-family: "IBM Plex Sans", sans-serif;
-      font-size: 14px;
-      min-height: 100vh;
+    function render(){
+      const buy = DATA.filter(x => x.signal === 'buy').length;
+      const sell = DATA.filter(x => x.signal === 'sell').length;
+      const watch = DATA.filter(x => x.signal === 'watch').length;
+      const hold = DATA.filter(x => x.signal === 'hold').length;
+
+      document.getElementById('buyCount').textContent = buy;
+      document.getElementById('sellCount').textContent = sell;
+      document.getElementById('watchCount').textContent = watch;
+      document.getElementById('holdCount').textContent = hold;
+
+      const list = document.getElementById('tokenList');
+      list.innerHTML = DATA.map(x => `
+        <div class="token" data-symbol="${x.symbol}">
+          <div class="row">
+            <div>
+              <div class="symbol">${x.symbol}/USD</div>
+              <div class="name">${x.name}</div>
+            </div>
+            <div>
+              <div class="price">${usd(x.price)}</div>
+              <div class="${x.change24hPct >= 0 ? 'g' : 'r'}">${pct(x.change24hPct)}</div>
+            </div>
+          </div>
+          <span class="pill ${x.signal}">${x.signal.toUpperCase()}</span>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.token').forEach(el => {
+        el.addEventListener('click', () => {
+          SELECTED = DATA.find(x => x.symbol === el.dataset.symbol);
+          renderDetail();
+        });
+      });
+
+      if (!SELECTED && DATA.length) SELECTED = DATA[0];
+      renderDetail();
     }
 
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    .app {
-      min-height: 100vh;
-    }
-
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(17, 17, 24, 0.94);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 14px 10px;
-    }
-
-    .header-top,
-    .header-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .header-top {
-      margin-bottom: 10px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 24px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .badge.primary {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .badge.live {
-      background: var(--green);
-      color: #000;
-    }
-
-    .title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      color: var(--text);
-      font-family: "IBM Plex Mono", monospace;
-      text-transform: uppercase;
-    }
-
-    .live-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--green);
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 11px;
-    }
-
-    .pulse {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--green);
-      box-shadow: 0 0 0 rgba(0, 230, 118, 0.4);
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.5);
+    function renderDetail(){
+      const el = document.getElementById('detail');
+      if(!SELECTED){
+        el.innerHTML = '<div class="sub">No token selected.</div>';
+        return;
       }
-      70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(0, 230, 118, 0);
+
+      el.innerHTML = `
+        <div style="font-size:22px;font-weight:700;margin-bottom:6px">${SELECTED.symbol}/USD</div>
+        <div class="sub" style="margin-bottom:14px">${SELECTED.name}</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:6px">${usd(SELECTED.price)}</div>
+        <div class="${SELECTED.change24hPct >= 0 ? 'g' : 'r'}" style="margin-bottom:14px">${pct(SELECTED.change24hPct)} · 24h</div>
+        <span class="pill ${SELECTED.signal}" style="margin-bottom:14px">${SELECTED.signal.toUpperCase()}</span>
+        <div class="detailgrid" style="margin-top:14px">
+          <div class="mini"><div class="k">1h change</div><div>${pct(SELECTED.change1hPct)}</div></div>
+          <div class="mini"><div class="k">7d change</div><div>${pct(SELECTED.change7dPct)}</div></div>
+          <div class="mini"><div class="k">Volume</div><div>${new Intl.NumberFormat('en-US',{notation:'compact'}).format(SELECTED.volume)}</div></div>
+          <div class="mini"><div class="k">Signal</div><div>${SELECTED.signal.toUpperCase()}</div></div>
+        </div>
+      `;
+    }
+
+    async function loadData(){
+      const ids = TOKENS.map(t => t.id).join(',');
+      document.getElementById('status').textContent = 'Loading live market data...';
+
+      try{
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${encodeURIComponent(ids)}&order=market_cap_desc&sparkline=false&price_change_percentage=1h,24h,7d`);
+        const rows = await res.json();
+
+        DATA = TOKENS.map(t => {
+          const row = rows.find(r => r.id === t.id);
+          if(!row) return null;
+          return {
+            symbol: t.symbol,
+            name: t.name,
+            price: row.current_price,
+            change1hPct: row.price_change_percentage_1h_in_currency || 0,
+            change24hPct: row.price_change_percentage_24h_in_currency || 0,
+            change7dPct: row.price_change_percentage_7d_in_currency || 0,
+            volume: row.total_volume || 0,
+            signal: 'hold'
+          };
+        }).filter(Boolean).map(x => ({ ...x, signal: classify(x) }));
+
+        DATA.sort((a,b) => {
+          const order = { buy: 0, sell: 1, watch: 2, hold: 3 };
+          return order[a.signal] - order[b.signal] || b.change24hPct - a.change24hPct;
+        });
+
+        document.getElementById('status').textContent = `LIVE · CoinGecko · ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+        document.getElementById('foot').textContent = `${DATA.length}/${TOKENS.length} tokens scanned · updated ${new Date().toLocaleString()}`;
+        render();
+      }catch(err){
+        document.getElementById('status').textContent = 'Load failed';
+        document.getElementById('foot').textContent = 'Error: ' + err.message;
       }
-      100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
-      }
     }
 
-    .session {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: var(--text2);
-      font-size: 11px;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .session-pill {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      border-radius: 999px;
-      padding: 4px 8px;
-    }
-
-    .session-pill.active {
-      color: var(--green);
-      border-color: rgba(0, 230, 118, 0.3);
-      background: rgba(0, 230, 118, 0.08);
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .btn {
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 8px;
-      background: var(--bg3);
-      color: var(--text);
-      border: 1px solid var(--border);
-      transition: 0.18s ease;
-    }
-
-    .btn:hover {
-      background: var(--bg4);
-      border-color: var(--border2);
-    }
-
-    .btn.primary {
-      background: var(--blue);
-      color: #fff;
-      border-color: transparent;
-    }
-
-    .btn.primary:hover {
-      filter: brightness(1.08);
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-
-    .tab {
-      min-height: 48px;
-      padding: 12px 8px;
-      background: transparent;
-      color: var(--text2);
-      border-bottom: 2px solid transparent;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: "IBM Plex Mono", monospace;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .tab.active {
-      color: var(--text);
-      border-bottom-color: var(--blue);
-      background: var(--bg3);
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 12px 14px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .metric-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      min-height: 72px;
-    }
-
-    .metric-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text3);
-      margin-bottom: 6px;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .metric-value {
-      font-size: 20px;
-      font-weight: 700;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .metric-sub {
-      margin-top: 4px;
-      color: var(--text2);
-      font-size: 11px;
-    }
-
-    .g { color: var(--green); }
-    .r { color: var(--red); }
-    .a { color: var(--amber); }
-    .b { color: var(--blue); }
-    .p { color: var(--purple); }
-
-    .filters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-
-    .filters select,
-    .filters input {
-      height: 38px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--text);
-      padding: 0 12px;
-      min-width: 120px;
-      outline: none;
-    }
-
-    .filters input {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .filters .mini {
-      min-width: 86px;
-    }
-
-    .board {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 0;
-      min-height: calc(100vh - 250px);
-    }
-
-    .left-pane {
-      border-right: 1px solid var(--border);
-      min-width: 0;
-    }
-
-    .right-pane {
-      min-width: 0;
-      background: rgba(17, 17, 24, 0.5);
-    }
-
-    .list {
-      padding: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .token-card {
-      background: linear-gradient(180deg, var(--bg3), var(--bg4));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      display: grid;
-      gap: 10px;
-      box-shadow: var(--shadow);
-      transition: 0.18s ease;
-      cursor: pointer;
-    }
-
-    .token-card:hover,
-    .token-card.active {
-      border-color: var(--border2);
-      transform: translateY(-1px);
-    }
-
-    .card-top,
-    .card-mid,
-    .card-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .token-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .coin-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.04);
-    }
-
-    .token-title {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .symbol {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .name {
-      font-size: 12px;
-      color: var(--text2);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 240px;
-    }
-
-    .price-box {
-      text-align: right;
-    }
-
-    .price {
-      font-size: 17px;
-      font-weight: 700;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .change {
-      font-size: 12px;
-      margin-top: 3px;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .pill {
-      padding: 5px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-family: "IBM Plex Mono", monospace;
-      border: 1px solid transparent;
-    }
-
-    .pill.buy { background: var(--buy-bg); color: var(--green); border-color: rgba(0, 230, 118, 0.25); }
-    .pill.sell { background: var(--sell-bg); color: var(--red); border-color: rgba(255, 69, 105, 0.25); }
-    .pill.watch { background: var(--watch-bg); color: var(--amber); border-color: rgba(255, 179, 0, 0.25); }
-    .pill.hold { background: var(--hold-bg); color: var(--blue); border-color: rgba(79, 140, 255, 0.25); }
-    .pill.state { background: rgba(142, 108, 255, 0.12); color: #b6a4ff; border-color: rgba(142, 108, 255, 0.25); }
-    .pill.setup { background: rgba(0, 213, 255, 0.12); color: var(--cyan); border-color: rgba(0, 213, 255, 0.25); }
-
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      width: 100%;
-    }
-
-    .mini-stat {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 8px;
-      padding: 8px;
-    }
-
-    .mini-stat .k {
-      color: var(--text3);
-      font-size: 10px;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .mini-stat .v {
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 600;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .detail {
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-      position: sticky;
-      top: 146px;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, var(--bg3), var(--bg4));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel h3 {
-      font-size: 12px;
-      font-family: "IBM Plex Mono", monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text2);
-      margin-bottom: 10px;
-    }
-
-    .detail-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .detail-price {
-      font-size: 24px;
-      font-weight: 700;
-      font-family: "IBM Plex Mono", monospace;
-      margin-top: 4px;
-    }
-
-    .grid-2,
-    .grid-3,
-    .grid-4 {
-      display: grid;
-      gap: 8px;
-    }
-
-    .grid-2 { grid-template-columns: repeat(2, 1fr); }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid-4 { grid-template-columns: repeat(4, 1fr); }
-
-    .kv {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .kv .k {
-      font-size: 10px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: "IBM Plex Mono", monospace;
-      margin-bottom: 5px;
-    }
-
-    .kv .v {
-      font-size: 14px;
-      color: var(--text);
-      font-weight: 600;
-      font-family: "IBM Plex Mono", monospace;
-    }
-
-    .note {
-      color: var(--text2);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .bar-wrap {
-      display: grid;
-      gap: 8px;
-    }
-
-    .bar-row {
-      display: grid;
-      grid-template-columns: 84px 1fr 50px;
-      gap: 8px;
-      align-items: center;
-      font-size: 12px;
-    }
-
-    .bar-label,
-    .bar-value {
-      font-family: "IBM Plex Mono", monospace;
-      color: var(--text2);
-    }
-
-    .bar-value {
-      text-align: right;
-      color: var(--text);
-    }
-
-    .bar {
-      height: 8px;
-      border-radius: 999px;
-      background: #0e1017;
-      border: 1px solid rgba(255,255,255,0.04);
-      overflow: hidden;
-    }
-
-    .bar > span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--blue), var(--cyan));
-    }
-
-    .table-like {
-      display: grid;
-      gap: 8px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px dashed rgba(255,255,255,0.06);
-    }
-
-    .row:last-child {
-      border-bottom: 0;
-    }
-
-    .row .label {
-      color: var(--text2);
-      font-size: 12px;
-    }
-
-    .row .value {
-      color: var(--text);
-      font-size: 12px;
-      font-family: "IBM Plex Mono", monospace;
-      text-align: right;
-    }
-
-    .section {
-      padding: 14px;
-      display: 
+    document.getElementById('refreshBtn').addEventListener('click', loadData);
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+</body>
+</html>
