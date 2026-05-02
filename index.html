@@ -1,216 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Revolut X · Pro Scanner v5 · LIVE</title>
-  <style>
-    :root{
-      --bg:#0b0d12;--panel:#141925;--panel2:#1b2231;--border:#2a3347;
-      --text:#eef3ff;--muted:#9aa6c7;--green:#00e676;--red:#ff4569;
-      --amber:#ffb300;--blue:#4f8cff
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    .wrap{max-width:1200px;margin:0 auto;padding:16px}
-    .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-    .title{font-size:24px;font-weight:700}
-    .sub{color:var(--muted);font-size:14px;margin-top:6px}
-    .btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-    .card,.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
-    .k{color:var(--muted);font-size:12px;text-transform:uppercase;margin-bottom:8px}
-    .v{font-size:26px;font-weight:700}
-    .g{color:var(--green)} .r{color:var(--red)} .a{color:var(--amber)} .b{color:var(--blue)}
-    .layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
-    .list{display:grid;gap:10px}
-    .token{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}
-    .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-    .symbol{font-weight:700;font-size:16px}
-    .name{color:var(--muted);font-size:13px;margin-top:4px}
-    .price{font-weight:700}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-top:8px}
-    .buy{background:rgba(0,230,118,.12);color:var(--green)}
-    .sell{background:rgba(255,69,105,.12);color:var(--red)}
-    .watch{background:rgba(255,179,0,.12);color:var(--amber)}
-    .hold{background:rgba(79,140,255,.12);color:var(--blue)}
-    .detailgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .mini{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px}
-    .mini .k{margin-bottom:4px}
-    .foot{margin-top:16px;color:var(--muted);font-size:12px}
-    @media (max-width:900px){.layout,.grid{grid-template-columns:1fr 1fr}}
-    @media (max-width:700px){.layout,.grid,.detailgrid{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Revolut X · Pro Scanner v5 · LIVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#171722;--bg4:#202032;--border:#2a2a3a;--border2:#3a3a53;--text:#edf0f6;--text2:#9ea4bb;--text3:#616781;--green:#00e676;--red:#ff4569;--amber:#ffb300;--blue:#4f8cff;--purple:#8e6cff;--cyan:#00d5ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(180deg,#0a0a0f 0%,#0c0d14 100%);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;min-height:100vh}
+.wrap{max-width:1400px;margin:0 auto;padding:14px}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.title{font-size:20px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:0.03em}
+.sub{color:var(--text2);font-size:12px;margin-top:4px;font-family:'IBM Plex Mono',monospace}
+.live{display:flex;align-items:center;gap:8px;color:var(--green);font-size:11px;font-family:'IBM Plex Mono',monospace}
+.pulse{width:8px;height:8px;border-radius:999px;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%{transform:scale(.95);box-shadow:0 0 0 0 rgba(0,230,118,.5)}70%{transform:scale(1);box-shadow:0 0 0 10px rgba(0,230,118,0)}100%{transform:scale(.95)}}
+.session{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2)}
+.session span{background:var(--bg3);border:1px solid var(--border);padding:4px 8px;border-radius:999px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:.18s}
+.btn:hover{filter:brightness(1.1)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);background:var(--bg2);margin-bottom:14px}
+.tab{padding:12px 8px;background:transparent;color:var(--text2);border:0;border-bottom:2px solid transparent;font-size:11px;font-weight:600;text-transform:uppercase;cursor:pointer;font-family:'IBM Plex Mono',monospace}
+.tab.active{color:var(--text);border-bottom-color:var(--blue);background:var(--bg3)}
+.view{display:none}
+.view.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+.metric .k{font-size:10px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-family:'IBM Plex Mono',monospace}
+.metric .v{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.g{color:var(--green)}.r{color:var(--red)}.a{color:var(--amber)}.b{color:var(--blue)}.p{color:var(--purple)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters select,.filters input{height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);padding:0 10px;min-width:100px;font-size:13px}
+.filters input{flex:1;min-width:180px}
+.board{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+.left,.right{min-width:0}
+.right{background:rgba(17,17,24,.5);border-radius:12px;padding:14px}
+.list{display:grid;gap:10px}
+.card{background:linear-gradient(180deg,var(--bg3),var(--bg4));border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:.18s}
+.card:hover,.card.active{border-color:var(--border2);transform:translateY(-1px)}
+.row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.symbol{font-size:16px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.name{font-size:12px;color:var(--text2);margin-top:3px}
+.price{font-size:17px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.change{font-size:12px;margin-top:3px;font-family:'IBM Plex Mono',monospace}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{padding:4px 8px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.pill.buy{background:rgba(0,230,118,.12);color:var(--green)}
+.pill.sell{background:rgba(255,69,105,.12);color:var(--red)}
+.pill.watch{background:rgba(255,179,0,.12);color:var(--amber)}
+.pill.hold{background:rgba(79,140,255,.12);color:var(--blue)}
+.pill.state{background:rgba(142,108,255,.12);color:#b6a4ff}
+.pill.setup{background:rgba(0,213,255,.12);color:var(--cyan)}
+.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.mini{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:8px;padding:8px}
+.mini .k{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
+.mini .v{font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.panel{background:linear-gradient(180deg,var(--bg3),var(--bg4));border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+.panel h3{font-size:11px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;font-family:'IBM Plex Mono',monospace}
+.detail-price{font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin:6px 0}
+.grid2,.grid3,.grid4{display:grid;gap:8px}
+.grid2{grid-template-columns:repeat(2,1fr)}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.grid4{grid-template-columns:repeat(4,1fr)}
+.kv{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:10px}
+.kv .k{font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:5px;font-family:'IBM Plex Mono',monospace}
+.kv .v{font-size:14px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.bar-wrap{display:grid;gap:8px}
+.bar-row{display:grid;grid-template-columns:80px 1fr 50px;gap:8px;align-items:center}
+.bar-label,.bar-value{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2)}
+.bar-value{text-align:right;color:var(--text)}
+.bar{height:8px;border-radius:999px;background:#0e1017;border:1px solid rgba(255,255,255,.04);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:inherit}
+.tbl{display:grid;gap:6px}
+.tbl-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.tbl-row:last-child{border-bottom:0}
+.tbl-row .label{color:var(--text2);font-size:12px}
+.tbl-row .value{color:var(--text);font-size:12px;font-family:'IBM Plex Mono',monospace}
+.section{padding:14px;display:grid;gap:12px}
+.ov-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+.opp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.rank-list{display:grid;gap:8px}
+.rank-item{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+.rank-num{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:var(--bg4);font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.foot{padding:12px 14px;color:var(--text3);font-size:11px;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--border);background:var(--bg2)}
+@media(max-width:1100px){.board,.ov-grid,.opp-grid{grid-template-columns:1fr}.right{margin-top:14px}}
+@media(max-width:760px){.tabs{grid-template-columns:repeat(2,1fr)}.metrics,.mini-grid,.grid4,.grid3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.metrics,.mini-grid,.grid4,.grid3,.grid2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <div class="title">Revolut X · Pro Scanner v5 · LIVE</div>
-        <div class="sub" id="status">Loading live market data...</div>
-      </div>
-      <button class="btn" id="refreshBtn">Refresh</button>
-    </div>
+<div class="wrap">
+<header class="hdr">
+<div>
+<div class="title">Revolut X · Pro Scanner v5 · LIVE</div>
+<div class="sub" id="statusText">Ready</div>
+</div>
+<div class="live"><span class="pulse"></span><span id="liveText">LIVE · CoinGecko</span></div>
+<div class="session" id="sessionBar"></div>
+<button class="btn" id="refreshBtn">Refresh</button>
+</header>
 
-    <div class="grid">
-      <div class="card"><div class="k">Buy</div><div class="v g" id="buyCount">0</div></div>
-      <div class="card"><div class="k">Sell</div><div class="v r" id="sellCount">0</div></div>
-      <div class="card"><div class="k">Watch</div><div class="v a" id="watchCount">0</div></div>
-      <div class="card"><div class="k">Hold</div><div class="v b" id="holdCount">0</div></div>
-    </div>
+<nav class="tabs">
+<button class="tab active" data-view="scannerView">Scanner</button>
+<button class="tab" data-view="overviewView">Market</button>
+<button class="tab" data-view="oppsView">Setups</button>
+<button class="tab" data-view="healthView">Health</button>
+</nav>
 
-    <div class="layout">
-      <div class="panel">
-        <div class="k">Scanner</div>
-        <div class="list" id="tokenList"></div>
-      </div>
+<section class="metrics">
+<div class="metric"><div class="k">Buy</div><div class="v g" id="buyCount">0</div></div>
+<div class="metric"><div class="k">Sell</div><div class="v r" id="sellCount">0</div></div>
+<div class="metric"><div class="k">Watch</div><div class="v a" id="watchCount">0</div></div>
+<div class="metric"><div class="k">Hold</div><div class="v b" id="holdCount">0</div></div>
+</section>
 
-      <div class="panel">
-        <div class="k">Selected token</div>
-        <div id="detail"></div>
-      </div>
-    </div>
+<main>
+<section class="view active" id="scannerView">
+<div class="filters">
+<select id="signalFilter"><option value="all">All signals</option><option value="buy">Buy</option><option value="sell">Sell</option><option value="watch">Watch</option><option value="hold">Hold</option></select>
+<select id="stateFilter"><option value="all">All states</option><option value="bull">Bull</option><option value="bear">Bear</option><option value="pullback">Pullback</option><option value="breakout">Breakout</option><option value="range">Range</option></select>
+<select id="sortBy"><option value="rank">Sort: score</option><option value="change24">Sort: 24h</option><option value="volume">Sort: volume</option><option value="symbol">Sort: symbol</option></select>
+<input id="searchInput" type="text" placeholder="Search..."/>
+</div>
+<div class="board">
+<div class="left"><div class="list" id="tokenList"></div></div>
+<aside class="right"><div id="detailPane"></div></aside>
+</div>
+</section>
 
-    <div class="foot" id="foot">Waiting for data...</div>
-  </div>
+<section class="view" id="overviewView">
+<div class="section">
+<div class="ov-grid">
+<div class="panel"><h3>Scanner overview</h3><div class="grid4"><div class="kv"><div class="k">Configured</div><div class="v" id="ovConfigured">0</div></div><div class="kv"><div class="k">Scanned</div><div class="v" id="ovScanned">0</div></div><div class="kv"><div class="k">Missing</div><div class="v" id="ovMissing">0</div></div><div class="kv"><div class="k">Updated</div><div class="v" id="ovUpdated">--</div></div></div><div style="height:10px"></div><div class="bar-wrap" id="breadthBars"></div></div>
+<div class="panel"><h3>Session and breadth</h3><div class="tbl"><div class="tbl-row"><div class="label">Session</div><div class="value" id="ovSession">--</div></div><div class="tbl-row"><div class="label">Avg RSI</div><div class="value" id="ovAvgRsi">--</div></div><div class="tbl-row"><div class="label">Avg 24h %</div><div class="value" id="ovAvg24">--</div></div><div class="tbl-row"><div class="label">% Above EMA20</div><div class="value" id="ovAboveEma">--</div></div><div class="tbl-row"><div class="label">% Above VWAP</div><div class="value" id="ovAboveVwap">--</div></div></div></div>
+</div>
+<div class="ov-grid">
+<div class="panel"><h3>Market states</h3><div class="grid3" id="stateStats"></div></div>
+<div class="panel"><h3>Action states</h3><div class="grid3" id="actionStats"></div></div>
+</div>
+</div>
+</section>
 
-  <script>
-    const TOKENS = [
-      { symbol:"BTC", name:"Bitcoin", id:"bitcoin" },
-      { symbol:"ETH", name:"Ethereum", id:"ethereum" },
-      { symbol:"XRP", name:"XRP", id:"ripple" },
-      { symbol:"SOL", name:"Solana", id:"solana" },
-      { symbol:"DOGE", name:"Dogecoin", id:"dogecoin" },
-      { symbol:"ADA", name:"Cardano", id:"cardano" },
-      { symbol:"LINK", name:"Chainlink", id:"chainlink" },
-      { symbol:"AVAX", name:"Avalanche", id:"avalanche-2" },
-      { symbol:"SUI", name:"Sui", id:"sui" },
-      { symbol:"PEPE", name:"Pepe", id:"pepe" },
-      { symbol:"BONK", name:"Bonk", id:"bonk" },
-      { symbol:"PENGU", name:"Pudgy Penguins", id:"pudgy-penguins" }
-    ];
+<section class="view" id="oppsView">
+<div class="section">
+<div class="opp-grid">
+<div class="panel"><h3>Top breakouts</h3><div class="rank-list" id="breakoutList"></div></div>
+<div class="panel"><h3>Best pullbacks</h3><div class="rank-list" id="pullbackList"></div></div>
+</div>
+<div class="opp-grid">
+<div class="panel"><h3>Strongest bulls</h3><div class="rank-list" id bullList"></div></div>
+<div class="panel"><h3>Weakest bears</h3><div class="rank-list" id="bearList"></div></div>
+</div>
+</div>
+</section>
 
-    let DATA = [];
-    let SELECTED = null;
+<section class="view" id="healthView">
+<div class="section">
+<div class="ov-grid">
+<div class="panel"><h3>Coverage health</h3><div class="tbl"><div class="tbl-row"><div class="label">Configured</div><div class="value" id="healthConfigured">0</div></div><div class="tbl-row"><div class="label">Scanned</div><div class="value" id="healthScanned">0</div></div><div class="tbl-row"><div class="label">Missing</div><div class="value" id="healthMissing">0</div></div><div class="tbl-row"><div class="label">Data quality</div><div class="value" id="healthQuality">--</div></div></div></div>
+<div class="panel"><h3>Missing tokens</h3><div class="sub" id="missingText">No missing tokens.</div></div>
+</div>
+</div>
+</section>
+</main>
 
-    function usd(v){
-      if(v >= 1) return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:4}).format(v);
-      return '$' + Number(v).toFixed(8).replace(/0+$/,'').replace(/\.$/,'');
-    }
+<footer class="foot" id="footerText">Ready.</footer>
+</div>
 
-    function pct(v){
-      const n = Number(v || 0);
-      return `${n > 0 ? '+' : ''}${n.toFixed(2)}%`;
-    }
+<script>
+const APP_VERSION="5.0.0",REFRESH_MS=60000,BASE_CURRENCY="usd";
+const UNIVERSE=[
+{symbol:"BTC",name:"Bitcoin",cgId:"bitcoin",color:"#f7931a",sector:"major"},
+{symbol:"ETH",name:"Ethereum",cgId:"ethereum",color:"#627eea",sector:"major"},
+{symbol:"XRP",name:"XRP",cgId:"ripple",color:"#4aa3ff",sector:"major"},
+{symbol:"SOL",name:"Solana",cgId:"solana",color:"#14f195",sector:"layer1"},
+{symbol:"ADA",name:"Cardano",cgId:"cardano",color:"#2a7de1",sector:"layer1"},
+{symbol:"DOGE",name:"Dogecoin",cgId:"dogecoin",color:"#c3a634",sector:"memecoin"},
+{symbol:"TRX",name:"TRON",cgId:"tron",color:"#ff3344",sector:"layer1"},
+{symbol:"LINK",name:"Chainlink",cgId:"chainlink",color:"#2a5ada",sector:"oracle"},
+{symbol:"AVAX",name:"Avalanche",cgId:"avalanche-2",color:"#e84142",sector:"layer1"},
+{symbol:"DOT",name:"Polkadot",cgId:"polkadot",color:"#e6007a",sector:"layer1"},
+{symbol:"SUI",name:"Sui",cgId:"sui",color:"#6ad5ff",sector:"layer1"},
+{symbol:"SHIB",name:"Shiba Inu",cgId:"shiba-inu",color:"#f28b2f",sector:"memecoin"},
+{symbol:"PEPE",name:"Pepe",cgId:"pepe",color:"#7fd13b",sector:"memecoin"},
+{symbol:"APT",name:"Aptos",cgId:"aptos",color:"#ffffff",sector:"layer1"},
+{symbol:"ARB",name:"Arbitrum",cgId:"arbitrum",color:"#28a0f0",sector:"layer2"},
+{symbol:"OP",name:"Optimism",cgId:"optimism",color:"#ff0420",sector:"layer2"},
+{symbol:"ATOM",name:"Cosmos Hub",cgId:"cosmos",color:"#7b86ff",sector:"layer1"},
+{symbol:"INJ",name:"Injective",cgId:"injective-protocol",color:"#00d8ff",sector:"defi"},
+{symbol:"NEAR",name:"NEAR Protocol",cgId:"near",color:"#9effc7",sector:"layer1"},
+{symbol:"UNI",name:"Uniswap",cgId:"uniswap",color:"#ff5ca9",sector:"defi"},
+{symbol:"AAVE",name:"Aave",cgId:"aave",color:"#b6509e",sector:"defi"},
+{symbol:"BCH",name:"Bitcoin Cash",cgId:"bitcoin-cash",color:"#8dc351",sector:"major"},
+{symbol:"LTC",name:"Litecoin",cgId:"litecoin",color:"#b8b8b8",sector:"major"},
+{symbol:"ETC",name:"Ethereum Classic",cgId:"ethereum-classic",color:"#4caf50",sector:"layer1"},
+{symbol:"HBAR",name:"Hedera",cgId:"hedera-hashgraph",color:"#00c6ff",sector:"infra"},
+{symbol:"ALGO",name:"Algorand",cgId:"algorand",color:"#ffffff",sector:"layer1"},
+{symbol:"FIL",name:"Filecoin",cgId:"filecoin",color:"#3bb6ff",sector:"storage"},
+{symbol:"SEI",name:"Sei",cgId:"sei-network",color:"#ff6f61",sector:"layer1"},
+{symbol:"WIF",name:"dogwifhat",cgId:"dogwifcoin",color:"#f1b44c",sector:"memecoin"},
+{symbol:"BONK",name:"Bonk",cgId:"bonk",color:"#f7d54a",sector:"memecoin"},
+{symbol:"FLOKI",name:"Floki",cgId:"floki",color:"#d0a450",sector:"memecoin"},
+{symbol:"PENGU",name:"Pudgy Penguins",cgId:"pudgy-penguins",color:"#7fd8ff",sector:"memecoin"},
+{symbol:"JUP",name:"Jupiter",cgId:"jupiter-exchange-solana",color:"#6bf3b5",sector:"defi"},
+{symbol:"TIA",name:"Celestia",cgId:"celestia",color:"#aa8bff",sector:"infra"},
+{symbol:"RENDER",name:"Render",cgId:"render-token",color:"#ff6e61",sector:"ai"},
+{symbol:"ONDO",name:"Ondo",cgId:"ondo-finance",color:"#8ed1ff",sector:"rwa"},
+{symbol:"ENS",name:"Ethereum Name Service",cgId:"ethereum-name-service",color:"#5e9dff",sector:"infra"},
+{symbol:"LDO",name:"Lido DAO",cgId:"lido-dao",color:"#3ce0d0",sector:"defi"},
+{symbol:"MKR",name:"Maker",cgId:"maker",color:"#1abc9c",sector:"defi"},
+{symbol:"RUNE",name:"THORChain",cgId:"thorchain",color:"#19e3d1",sector:"defi"}
+];
 
-    function classify(t){
-      if ((t.change24hPct > 3 && t.change7dPct > 5) || (t.change24hPct > 1.5 && t.change1hPct > 0.4)) return 'buy';
-      if (t.change24hPct < -3 || (t.change1hPct < -1 && t.change7dPct < 0)) return 'sell';
-      if (Math.abs(t.change24hPct) < 1.2) return 'hold';
-      return 'watch';
-    }
+const st={analyses:[],filtered:[],missing:[],selectedId:null,lastUpdated:null,refreshInFlight:false,apiErrors:0};
+const els={
+tabs:[...document.querySelectorAll(".tab")],
+views:[...document.querySelectorAll(".view")],
+tokenList:document.getElementById("tokenList"),
+detailPane:document.getElementById("detailPane"),
+refreshBtn:document.getElementById("refreshBtn"),
+signalFilter:document.getElementById("signalFilter"),
+stateFilter:document.getElementById("stateFilter"),
+sortBy:document.getElementById("sortBy"),
+searchInput:document.getElementById("searchInput"),
+footerText:document.getElementById("footerText"),
+sessionBar:document.getElementById("sessionBar"),
+liveText:document.getElementById("liveText"),
+statusText:document.getElementById("statusText"),
+buyCount:document.getElementById("buyCount"),
+sellCount:document.getElementById("sellCount"),
+watchCount:document.getElementById("watchCount"),
+holdCount:document.getElementById("holdCount"),
+ovConfigured:document.getElementById("ovConfigured"),
+ovScanned:document.getElementById("ovScanned"),
+ovMissing:document.getElementById("ovMissing"),
+ovUpdated:document.getElementById("ovUpdated"),
+ovSession:document.getElementById("ovSession"),
+ovAvgRsi:document.getElementById("ovAvgRsi"),
+ovAvg24:document.getElementById("ovAvg24"),
+ovAboveEma:document.getElementById("ovAboveEma"),
+ovAboveVwap:document.getElementById("ovAboveVwap"),
+breadthBars:document.getElementById("breadthBars"),
+stateStats:document.getElementById("stateStats"),
+actionStats:document.getElementById("actionStats"),
+breakoutList:document.getElementById("breakoutList"),
+pullbackList:document.getElementById("pullbackList"),
+bullList:document.getElementById("bullList"),
+bearList:document.getElementById("bearList"),
+healthConfigured:document.getElementById("healthConfigured"),
+healthScanned:document.getElementById("healthScanned"),
+healthMissing:document.getElementById("healthMissing"),
+healthQuality:document.getElementById("healthQuality"),
+missingText:document.getElementById("missingText")
+};
 
-    function render(){
-      const buy = DATA.filter(x => x.signal === 'buy').length;
-      const sell = DATA.filter(x => x.signal === 'sell').length;
-      const watch = DATA.filter(x => x.signal === 'watch').length;
-      const hold = DATA.filter(x => x.signal === 'hold').length;
+const fmt={
+usd(v){if(v==null||isNaN(v))return"--";if(Math.abs(v)>=1000)return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v);if(Math.abs(v)>=1)return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:4}).format(v);return"$"+Number(v).toFixed(8).replace(/0+$/,"").replace(/\.$/,"")},
+compact(v){if(v==null||isNaN(v))return"--";return new Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:2}).format(v)},
+pct(v,d=2){if(v==null||isNaN(v))return"--";const s=v>0?"+":"";return`${s}${Number(v).toFixed(d)}%`},
+num(v,d=2){if(v==null||isNaN(v))return"--";return Number(v).toFixed(d)},
+time(ts){if(!ts)return"--";return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})},
+dateTime(ts){if(!ts)return"--";return new Date(ts).toLocaleString([],{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"})}
+};
 
-      document.getElementById('buyCount').textContent = buy;
-      document.getElementById('sellCount').textContent = sell;
-      document.getElementById('watchCount').textContent = watch;
-      document.getElementById('holdCount').textContent = hold;
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function norm(v,min,max){if(max===min)return 0;return clamp((v-min)/(max-min),0,1)}
+function score100(x){return Math.round(clamp(x,0,1)*100)}
 
-      const list = document.getElementById('tokenList');
-      list.innerHTML = DATA.map(x => `
-        <div class="token" data-symbol="${x.symbol}">
-          <div class="row">
-            <div>
-              <div class="symbol">${x.symbol}/USD</div>
-              <div class="name">${x.name}</div>
-            </div>
-            <div>
-              <div class="price">${usd(x.price)}</div>
-              <div class="${x.change24hPct >= 0 ? 'g' : 'r'}">${pct(x.change24hPct)}</div>
-            </div>
-          </div>
-          <span class="pill ${x.signal}">${x.signal.toUpperCase()}</span>
-        </div>
-      `).join('');
+function getSessionState(){const now=new Date(),day=now.getDay(),weekend=day===0||day===6;return{mode:weekend?"weekend":"weekday",note:weekend?"Half size · Limit orders":"Normal size · Active",clock:`CET ${now.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`,isWeekend:weekend}}
 
-      document.querySelectorAll('.token').forEach(el => {
-        el.addEventListener('click', () => {
-          SELECTED = DATA.find(x => x.symbol === el.dataset.symbol);
-          renderDetail();
-        });
-      });
+function renderSessionBar(){const s=getSessionState();els.sessionBar.innerHTML=`<span>${s.clock}</span><span>${s.mode.toUpperCase()}</span><span>${s.note}</span>`}
 
-      if (!SELECTED && DATA.length) SELECTED = DATA[0];
-      renderDetail();
-    }
+function ema(vals,p){if(!vals?.length)return null;const k=2/(p+1);let out=vals[0];for(let i=1;i<vals.length;i++)out=vals[i]*k+out*(1-k);return out}
+function rsi(vals,p=14){if(!vals||vals.length<p+1)return 50;let gains=0,losses=0;for(let i=vals.length-p;i<vals.length;i++){const diff=vals[i]-vals[i-1];if(diff>=0)gains+=diff;else losses+=Math.abs(diff)}if(losses===0)return 100;const rs=gains/losses;return 100-100/(1+rs)}
+function macd(vals){if(!vals?.length)return{line:0,signal:0,hist:0,bias:"neutral"};const fast=ema(vals,12)??0,slow=ema(vals,26)??0,line=fast-slow;const macdSeries=[];for(let i=0;i<vals.length;i++){const slice=vals.slice(0,i+1);macdSeries.push((ema(slice,12)??0)-(ema(slice,26)??0))}const signal=ema(macdSeries.slice(-9),9)??0,hist=line-signal;return{line,signal,hist,bias:hist>0?"bull":hist<0?"bear":"neutral"}}
+function avg(vals){if(!vals?.length)return 0;return vals.reduce((a,b)=>a+b,0)/vals.length}
+function stdDev(vals){if(!vals?.length)return 0;const mean=avg(vals),variance=avg(vals.map(v=>(v-mean)**2));return Math.sqrt(variance)}
 
-    function renderDetail(){
-      const el = document.getElementById('detail');
-      if(!SELECTED){
-        el.innerHTML = '<div class="sub">No token selected.</div>';
-        return;
-      }
+function computeIndicators(row){const prices=row.sparkline_in_7d?.price?.filter(v=>Number.isFinite(v))||[row.current_price];const current=row.current_price||prices[prices.length-1]||0;const ema20=ema(prices.slice(-40),20)??current;const ema50=ema(prices.slice(-80),50)??current;const avgPrice=avg(prices);const macdPack=macd(prices);const rsi14=rsi(prices,14);const sigma=stdDev(prices);const atr14=sigma*1.6||current*.02;const atrPct=current?(atr14/current)*100:0;const vwap=avgPrice;const vwapDeviationPct=current?((current-vwap)/vwap)*100:0;const recent=prices.slice(-12);const support1=Math.min(...recent);const resistance1=Math.max(...recent);const support2=support1-atr14;const resistance2=resistance1+atr14;const priceChanges=[];for(let i=1;i<prices.length;i++)priceChanges.push(((prices[i]-prices[i-1])/prices[i-1])*100);const shortMomentum=avg(priceChanges.slice(-6));const momentum5m=shortMomentum>.05?"bullish":shortMomentum<-.05?"bearish":"flat";const volumeRatio=clamp((row.total_volume||0)/Math.max(row.market_cap||1,1)*120,0,5);const volumeQuality=volumeRatio>=2?"high":volumeRatio>=.9?"medium":"low";const spreadRiskPct=clamp(atrPct*.35,.05,2.5);return{rsi14,macdLine:macdPack.line,macdSignal:macdPack.signal,macdHist:macdPack.hist,macdBias:macdPack.bias,ema20,ema50,emaTrend:ema20>ema50?"bull":ema20<ema50?"bear":"neutral",vwap,vwapDeviationPct,atr14,atrPct,support1,support2,resistance1,resistance2,trend1h:ema20>ema50?"bull":ema20<ema50?"bear":"range",momentum5m,volumeRatio,volumeQuality,spreadRiskPct}}
 
-      el.innerHTML = `
-        <div style="font-size:22px;font-weight:700;margin-bottom:6px">${SELECTED.symbol}/USD</div>
-        <div class="sub" style="margin-bottom:14px">${SELECTED.name}</div>
-        <div style="font-size:24px;font-weight:700;margin-bottom:6px">${usd(SELECTED.price)}</div>
-        <div class="${SELECTED.change24hPct >= 0 ? 'g' : 'r'}" style="margin-bottom:14px">${pct(SELECTED.change24hPct)} · 24h</div>
-        <span class="pill ${SELECTED.signal}" style="margin-bottom:14px">${SELECTED.signal.toUpperCase()}</span>
-        <div class="detailgrid" style="margin-top:14px">
-          <div class="mini"><div class="k">1h change</div><div>${pct(SELECTED.change1hPct)}</div></div>
-          <div class="mini"><div class="k">7d change</div><div>${pct(SELECTED.change7dPct)}</div></div>
-          <div class="mini"><div class="k">Volume</div><div>${new Intl.NumberFormat('en-US',{notation:'compact'}).format(SELECTED.volume)}</div></div>
-          <div class="mini"><div class="k">Signal</div><div>${SELECTED.signal.toUpperCase()}</div></div>
-        </div>
-      `;
-    }
+function calcTrendScore(market,indicators){const emaCross=indicators.ema20>indicators.ema50?1:0;const aboveEma20=market.price>indicators.ema20?1:0;const aboveVwap=market.price>indicators.vwap?1:0;const trend7d=norm(market.change7dPct,-12,12);return score100(.4*emaCross+.2*aboveEma20+.2*aboveVwap+.2*trend7d)}
+function calcMomentumScore(market,indicators){const rsiSweet=clamp(1-Math.abs(indicators.rsi14-60)/22,0,1);const macdNorm=norm(indicators.macdHist,-.02,.02);const chg1h=norm(market.change1hPct,-3,3);const chg24=norm(market.change24hPct,-8,8);return score100(.35*rsiSweet+.35*macdNorm+.15*chg1h+.15*chg24)}
+function calcPullbackScore(market,indicators,scores){const bullishContext=scores.trendScore>=65?1:0;const vwapRetest=1-norm(Math.abs(indicators.vwapDeviationPct),0,2.8);const rsiCooldown=clamp(1-Math.abs(indicators.rsi14-43)/14,0,1);const supportDistPct=Math.abs((market.price-indicators.support1)/market.price)*100;const supportProximity=1-norm(supportDistPct,0,2.5);return score100(.4*bullishContext+.25*vwapRetest+.2*rsiCooldown+.15*supportProximity)}
+function calcBreakoutScore(market,indicators,scores){const aboveR1=market.price>indicators.resistance1*.997?1:0;const macdPos=indicators.macdHist>0?1:0;const rsiReady=indicators.rsi14>=58&&indicators.rsi14<=76?1:0;const volExpand=norm(indicators.volumeRatio,.7,2.4);const trendOk=scores.trendScore>60?1:0;return score100(.3*aboveR1+.25*macdPos+.2*rsiReady+.15*volExpand+.1*trendOk)}
+function calcBearScore(market,indicators){const emaCrossDown=indicators.ema20<indicators.ema50?1:0;const belowEma20=market.price<indicators.ema20?1:0;const belowVwap=market.price<indicators.vwap?1:0;const negTrend7d=norm(-market.change7dPct,-12,12);return score100(.4*emaCrossDown+.2*belowEma20+.2*belowVwap+.2*negTrend7d)}
+function calcLiquidityScore(market){return score100(norm(market.volume24hUsd,1e6,3e9))}
+function calcRiskScore(indicators,session){const atrRisk=norm(indicators.atrPct,.4,10);const spreadRisk=norm(indicators.spreadRiskPct,.05,1.5);const weekendPenalty=session.isWeekend?.15:0;return score100(.55*atrRisk+.3*spreadRisk+.15*weekendPenalty)}
+function calcConfidenceScore(scores){return score100(.3*(scores.trendScore/100)+.25*(scores.momentumScore/100)+.2*(Math.max(scores.pullbackScore,scores.breakoutScore)/100)+.15*(scores.liquidityScore/100)+.1*(1-scores.riskScore/100))}
+function calcWinProbability(scores){return score100(.35*(scores.trendScore/100)+.25*(scores.momentumScore/100)+.2*(Math.max(scores.pullbackScore,scores.breakoutScore)/100)+.1*(scores.liquidityScore/100)+.1*(1-scores.riskScore/100))}
+function calcRankScore(scores){return Number((.3*scores.trendScore+.25*scores.momentumScore+.2*Math.max(scores.pullbackScore,scores.breakoutScore)+.15*scores.liquidityScore-.1*scores.riskScore).toFixed(1))}
 
-    async function loadData(){
-      const ids = TOKENS.map(t => t.id).join(',');
-      document.getElementById('status').textContent = 'Loading live market data...';
+function classifyToken(token,market,indicators,scores,session){let marketState="range",actionState="hold",setupType="range",bias="neutral";const reasons=[];if(scores.breakoutScore>=75&&scores.trendScore>=60){marketState="breakout";actionState="buy";setupType="breakout";bias="bull";reasons.push("breakout_score_high","trend_confirmed")}else if(scores.pullbackScore>=70&&scores.trendScore>=65){marketState="pullback";actionState="watch";setupType="pullback";bias="bull";reasons.push("bull_context","pullback_quality_high")}else if(scores.trendScore>=70&&scores.momentumScore>=60){marketState="bull";actionState="buy";setupType="continuation";bias="bull";reasons.push("trend_strong","momentum_confirmed")}else if(scores.bearScore>=70&&indicators.macdBias==="bear"){marketState="bear";actionState="sell";setupType="continuation";bias="bear";reasons.push("bear_trend","macd_negative")}else if(indicators.rsi14>=75&&indicators.vwapDeviationPct>2.2){marketState="exhaustion";actionState="watch";setupType="reversal";bias="bull";reasons.push("overextended","far_above_vwap")}else{marketState="range";actionState="hold";setupType="range";bias=indicators.emaTrend==="bull"?"bull":indicators.emaTrend==="bear"?"bear":"neutral";reasons.push("no_clear_edge")}if(session.isWeekend&&actionState==="buy"){actionState="watch";reasons.push("weekend_downgrade")}const confidenceLabel=scores.confidenceScore>=75?"high":scores.confidenceScore>=50?"medium":"low";const riskLabel=scores.riskScore>=67?"high":scores.riskScore>=34?"medium":"low";const patternMap={breakout:{code:"B2",name:"Breakout Continuation"},pullback:{code:"PB1",name:"Bull Pullback"},continuation:{code:bias==="bull"?"C1":"C2",name:bias==="bull"?"Bull Continuation":"Bear Continuation"},reversal:{code:"R1",name:"Exhaustion Reversal"},range:{code:"RG",name:"Range Hold"}};const pattern=patternMap[setupType]||{code:"NA",name:"No Pattern"};return{marketState,actionState,setupType,bias,signalLabel:actionState.toUpperCase(),signalPriority:{buy:1,sell:2,watch:3,hold:4}[actionState]??9,patternCode:pattern.code,patternName:pattern.name,confidenceLabel,riskLabel,statusReason:reasons}}
 
-      try{
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${encodeURIComponent(ids)}&order=market_cap_desc&sparkline=false&price_change_percentage=1h,24h,7d`);
-        const rows = await res.json();
+function buildExecutionPlan(market,indicators,classification,session){const atr=indicators.atr14||market.price*.02;const riskPct=session.isWeekend?.35:.75;let entry,stop,tp1,tp2,tp3;if(classification.setupType==="breakout"){entry=indicators.resistance1;stop=entry-atr*1.2;tp1=entry+atr*1;tp2=entry+atr*2;tp3=entry+atr*3}else if(classification.setupType==="pullback"){entry=Math.max(indicators.vwap,indicators.support1);stop=entry-atr*1;tp1=entry+atr*1.2;tp2=entry+atr*2.2;tp3=entry+atr*3}else if(classification.actionState==="sell"){entry=Math.min(indicators.vwap,indicators.support1);stop=entry+atr*1.2;tp1=entry-atr*1;tp2=entry-atr*2;tp3=entry-atr*3}else{entry=market.price;stop=market.price-atr;tp1=market.price+atr;tp2=market.price+atr*2;tp3=market.price+atr*3}const riskReward=Math.abs(tp1-entry)/Math.max(Math.abs(entry-stop),.00000001);return{entry,stop,takeProfit1:tp1,takeProfit2:tp2,takeProfit3:tp3,riskReward:Number(riskReward.toFixed(2)),holdWindowMin:15,holdWindowMax:60,timeStopBars:10,riskPct,trailRule:"ema20_or_atr_1_5",addonRule:"vwap_bounce_and_rsi_gt_55",invalidationRule:"vwap_and_ema20_reversal"}}
 
-        DATA = TOKENS.map(t => {
-          const row = rows.find(r => r.id === t.id);
-          if(!row) return null;
-          return {
-            symbol: t.symbol,
-            name: t.name,
-            price: row.current_price,
-            change1hPct: row.price_change_percentage_1h_in_currency || 0,
-            change24hPct: row.price_change_percentage_24h_in_currency || 0,
-            change7dPct: row.price_change_percentage_7d_in_currency || 0,
-            volume: row.total_volume || 0,
-            signal: 'hold'
-          };
-        }).filter(Boolean).map(x => ({ ...x, signal: classify(x) }));
+async function fetchMarketRows(){const ids=UNIVERSE.map(t=>t.cgId).filter(Boolean).join(",");const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${BASE_CURRENCY}&ids=${encodeURIComponent(ids)}&order=market_cap_desc&sparkline=true&price_change_percentage=1h,24h,7d,30d&per_page=250&page=1`;const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw new Error(`HTTP ${res.status}`);return res.json()}
 
-        DATA.sort((a,b) => {
-          const order = { buy: 0, sell: 1, watch: 2, hold: 3 };
-          return order[a.signal] - order[b.signal] || b.change24hPct - a.change24hPct;
-        });
+function buildAnalyses(rows){const byId=new Map(rows.map(r=>[r.id,r]));const session=getSessionState();const analyses=[];const missing=[];for(const token of UNIVERSE){const row=byId.get(token.cgId);if(!row){missing.push({...token,reason:"missing_from_feed"});continue}const market={tokenId:token.symbol.toLowerCase(),asOf:new Date().toISOString(),source:"CoinGecko",price:row.current_price,change1hPct:row.price_change_percentage_1h_in_currency??0,change24hPct:row.price_change_percentage_24h_in_currency??0,change7dPct:row.price_change_percentage_7d_in_currency??0,change30dPct:row.price_change_percentage_30d_in_currency??0,volume24hUsd:row.total_volume??0,marketCapUsd:row.market_cap??0,dataQuality:"live",isStale:false};const indicators=computeIndicators(row);const scores={trendScore:calcTrendScore(market,indicators),momentumScore:calcMomentumScore(market,indicators),pullbackScore:0,breakoutScore:0,bearScore:calcBearScore(market,indicators),liquidityScore:calcLiquidityScore(market),riskScore:0,confidenceScore:0,winProbabilityPct:0,rankScore:0};scores.pullbackScore=calcPullbackScore(market,indicators,scores);scores.breakoutScore=calcBreakoutScore(market,indicators,scores);scores.riskScore=calcRiskScore(indicators,session);scores.confidenceScore=calcConfidenceScore(scores);scores.winProbabilityPct=calcWinProbability(scores);scores.rankScore=calcRankScore(scores);const classification=classifyToken(token,market,indicators,scores,session);const execution=buildExecutionPlan(market,indicators,classification,session);analyses.push({token,market,indicators,scores,classification,execution})}analyses.sort((a,b)=>b.scores.rankScore-a.scores.rankScore);return{analyses,missing}}
 
-        document.getElementById('status').textContent = `LIVE · CoinGecko · ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-        document.getElementById('foot').textContent = `${DATA.length}/${TOKENS.length} tokens scanned · updated ${new Date().toLocaleString()}`;
-        render();
-      }catch(err){
-        document.getElementById('status').textContent = 'Load failed';
-        document.getElementById('foot').textContent = 'Error: ' + err.message;
-      }
-    }
+function getFilteredAnalyses(){let list=[...st.analyses];const signal=els.signalFilter.value;const marketState=els.stateFilter.value;const q=els.searchInput.value.trim().toLowerCase();const sortBy=els.sortBy.value;if(signal!=="all")list=list.filter(x=>x.classification.actionState===signal);if(marketState!=="all")list=list.filter(x=>x.classification.marketState===marketState);if(q)list=list.filter(x=>{const hay=[x.token.symbol,x.token.name,x.classification.marketState,x.classification.actionState,x.classification.setupType,x.classification.patternName].join(" ").toLowerCase();return hay.includes(q)});list.sort((a,b)=>{switch(sortBy){case"change24":return b.market.change24hPct-a.market.change24hPct;case"volume":return b.market.volume24hUsd-a.market.volume24hUsd;case"symbol":return a.token.symbol.localeCompare(b.token.symbol);case"rank":default:return b.scores.rankScore-a.scores.rankScore}});return list}
 
-    document.getElementById('refreshBtn').addEventListener('click', loadData);
-    loadData();
-    setInterval(loadData, 60000);
-  </script>
+function renderTokenList(){st.filtered=getFilteredAnalyses();if(!st.filtered.length){els.tokenList.innerHTML=`<div class="panel"><div class="sub">No tokens match the current filters.</div></div>`;return}els.tokenList.innerHTML=st.filtered.map(item=>{const isActive=st.selectedId===item.token.symbol;const c=item.classification;const i=item.indicators;const m=item.market;return`<article class="card ${isActive?"active":""}" data-token="${item.token.symbol}"><div class="row"><div><div class="symbol">${item.token.symbol}/USD</div><div class="name">${item.token.name}</div></div><div><div class="price">${fmt.usd(m.price)}</div><div class="change ${m.change24hPct>=0?"g":"r"}">${fmt.pct(m.change24hPct)}</div></div></div><div class="pills"><span class="pill ${c.actionState}">${c.signalLabel}</span><span class="pill state">${c.marketState}</span><span class="pill setup">${c.setupType}</span></div><div class="mini-grid"><div class="mini"><div class="k">Score</div><div class="v">${fmt.num(item.scores.rankScore,1)}</div></div><div class="mini"><div class="k">RSI</div><div class="v">${fmt.num(i.rsi14,1)}</div></div><div class="mini"><div class="k">Trend</div><div class="v">${item.scores.trendScore}</div></div><div class="mini"><div class="k">Volume</div><div class="v">${i.volumeQuality}</div></div></div></article>`}).join("");[...els.tokenList.querySelectorAll(".card")].forEach(card=>{card.addEventListener("click",()=>{st.selectedId=card.dataset.token;renderAll()})})}
+
+function renderDetail(){const selected=st.analyses.find(x=>x.token.symbol===st.selectedId)||st.filtered[0]||st.analyses[0];if(!selected){els.detailPane.innerHTML=`<div class="panel"><div class="sub">No token selected.</div></div>`;return}st.selectedId=selected.token.symbol;const{token,market,indicators,scores,classification,execution}=selected;const changeCls=market.change24hPct>=0?"g":"r";els.detailPane.innerHTML=`<div class="panel"><div class="pills" style="margin-bottom:8px"><span class="pill ${classification.actionState}">${classification.signalLabel}</span><span class="pill state">${classification.marketState}</span><span class="pill setup">${classification.patternCode} · ${classification.setupType}</span></div><div class="symbol">${token.symbol}/USD</div><div class="name">${token.name}</div><div class="detail-price">${fmt.usd(market.price)}</div><div class="change ${changeCls}">${fmt.pct(market.change24hPct)} · 24h</div><div class="grid2" style="margin-top:10px"><div class="kv"><div class="k">Win prob</div><div class="v">${scores.winProbabilityPct}%</div></div><div class="kv"><div class="k">Confidence</div><div class="v">${scores.confidenceScore}%</div></div></div></div><div class="panel"><h3>Score engine</h3><div class="bar-wrap">${barRow("Trend",scores.trendScore)}${barRow("Momentum",scores.momentumScore)}${barRow("Pullback",scores.pullbackScore)}${barRow("Breakout",scores.breakoutScore)}${barRow("Bear",scores.bearScore)}${barRow("Liquidity",scores.liquidityScore)}${barRow("Risk",scores.riskScore)}</div></div><div class="panel"><h3>Indicators</h3><div class="grid4">${kv("RSI 14",fmt.num(indicators.rsi14,1))}${kv("MACD bias",indicators.macdBias)}${kv("EMA trend",indicators.emaTrend)}${kv("Momentum 5m",indicators.momentum5m)}${kv("EMA20",fmt.usd(indicators.ema20))}${kv("EMA50",fmt.usd(indicators.ema50))}${kv("VWAP",fmt.usd(indicators.vwap))}${kv("VWAP dev",fmt.pct(indicators.vwapDeviationPct))}${kv("ATR 14",fmt.usd(indicators.atr14))}${kv("ATR %",fmt.pct(indicators.atrPct))}${kv("S1",fmt.usd(indicators.support1))}${kv("R1",fmt.usd(indicators.resistance1))}</div></div><div class="panel"><h3>Execution plan</h3><div class="grid3">${kv("Entry",fmt.usd(execution.entry))}${kv("Stop",fmt.usd(execution.stop))}${kv("R:R",fmt.num(execution.riskReward,2))}${kv("TP1",fmt.usd(execution.takeProfit1))}${kv("TP2",fmt.usd(execution.takeProfit2))}${kv("TP3",fmt.usd(execution.takeProfit3))}${kv("Hold window",`${execution.holdWindowMin}-${execution.holdWindowMax}m`)}${kv("Time stop",`${execution.timeStopBars} bars`)}${kv("Risk",`${execution.riskPct}%`)}</div></div><div class="panel"><h3>Market snapshot</h3><div class="tbl"><div class="tbl-row"><div class="label">1h change</div><div class="value ${market.change1hPct>=0?"g":"r"}">${fmt.pct(market.change1hPct)}</div></div><div class="tbl-row"><div class="label">24h change</div><div class="value ${market.change24hPct>=0?"g":"r"}">${fmt.pct(market.change24hPct)}</div></div><div class="tbl-row"><div class="label">7d change</div><div class="value ${market.change7dPct>=0?"g":"r"}">${fmt.pct(market.change7dPct)}</div></div><div class="tbl-row"><div class="label">24h volume</div><div class="value">${fmt.compact(market.volume24hUsd)}</div></div><div class="tbl-row"><div class="label">Market cap</div><div class="value">${fmt.compact(market.marketCapUsd)}</div></div><div class="tbl-row"><div class="label">Updated</div><div class="value">${fmt.dateTime(st.lastUpdated)}</div></div></div></div>`}
+
+function kv(label,value){return`<div class="kv"><div class="k">${label}</div><div class="v">${value}</div></div>`}
+function barRow(label,value){const color=value>=70?"var(--green)":value>=50?"var(--amber)":"var(--blue)";return`<div class="bar-row"><div class="bar-label">${label}</div><div class="bar"><span style="width:${clamp(value,0,100)}%;background:${color}"></span></div><div class="bar-value">${value}</div></div>`}
+
+function summarize(){const summary={configured:UNIVERSE.length,scanned:st.analyses.length,missing:st.missing.length,actionCounts:{buy:0,sell:0,watch:0,hold:0,reduce:0,avoid:0},marketCounts:{bull:0,bear:0,pullback:0,breakout:0,range:0,exhaustion:0},avgRsi:0,avg24:0,pctAboveEma20:0,pctAboveVwap:0};if(!st.analyses.length)return summary;let aboveEma=0,aboveVwap=0,rsiSum=0,avg24Sum=0;st.analyses.forEach(x=>{summary.actionCounts[x.classification.actionState]=(summary.actionCounts[x.classification.actionState]||0)+1;summary.marketCounts[x.classification.marketState]=(summary.marketCounts[x.classification.marketState]||0)+1;rsiSum+=x.indicators.rsi14;avg24Sum+=x.market.change24hPct;if(x.market.price>x.indicators.ema20)aboveEma++;if(x.market.price>x.indicators.vwap)aboveVwap++});summary.avgRsi=rsiSum/st.analyses.length;summary.avg24=avg24Sum/st.analyses.length;summary.pctAboveEma20=(aboveEma/st.analyses.length)*100;summary.pctAboveVwap=(aboveVwap/st.analyses.length)*100;return summary}
+
+function renderSummary(){const s=summarize();const session=getSessionState();els.buyCount.textContent=s.actionCounts.buy;els.sellCount.textContent=s.actionCounts.sell;els.watchCount.textContent=s.actionCounts.watch;els.holdCount.textContent=s.actionCounts.hold;els.ovConfigured.textContent=s.configured;els.ovScanned.textContent=s.scanned;els.ovMissing.textContent=s.missing;els.ovUpdated.textContent=fmt.time(st.lastUpdated);els.ovSession.textContent=session.mode.toUpperCase();els.ovAvgRsi.textContent=fmt.num(s.avgRsi,1);els.ovAvg24.textContent=fmt.pct(s.avg24,2);els.ovAboveEma.textContent=fmt.pct(s.pctAboveEma20,1);els.ovAboveVwap.textContent=fmt.pct(s.pctAboveVwap,1);els.breadthBars.innerHTML=`${barRow("Above EMA20",Number(s.pctAboveEma20.toFixed(1)))}${barRow("Above VWAP",Number(s.pctAboveVwap.toFixed(1)))}${barRow("Avg RSI",Number(s.avgRsi.toFixed(1)))}${barRow("Buy ratio",Number(((s.actionCounts.buy/Math.max(1,s.scanned))*100).toFixed(1)))}`;const stateEntries=[["bull",s.marketCounts.bull],["breakout",s.marketCounts.breakout],["pullback",s.marketCounts.pullback],["bear",s.marketCounts.bear],["range",s.marketCounts.range],["exhaustion",s.marketCounts.exhaustion]];els.stateStats.innerHTML=stateEntries.map(([label,value])=>kv(label,value)).join("");const actionEntries=[["buy",s.actionCounts.buy],["sell",s.actionCounts.sell],["watch",s.actionCounts.watch],["hold",s.actionCounts.hold],["reduce",s.actionCounts.reduce],["avoid",s.actionCounts.avoid]];els.actionStats.innerHTML=actionEntries.map(([label,value])=>kv(label,value)).join("");renderOpportunityLists();els.healthConfigured.textContent=s.configured;els.healthScanned.textContent=s.scanned;els.healthMissing.textContent=s.missing;els.healthQuality.textContent=st.apiErrors?"degraded":"live";els.missingText.innerHTML=st.missing.length?st.missing.map(m=>`${m.symbol} · ${m.name} · ${m.reason}`).join("<br>"):"No missing tokens."}
+
+function renderOpportunityLists(){const top=(arr,n=6)=>arr.slice(0,n);const breakouts=top(st.analyses.filter(x=>x.classification.marketState==="breakout").sort((a,b)=>b.scores.breakoutScore-a.scores.breakoutScore));const pullbacks=top(st.analyses.filter(x=>x.classification.marketState==="pullback").sort((a,b)=>b.scores.pullbackScore-a.scores.pullbackScore));const bulls=top(st.analyses.filter(x=>x.classification.bias==="bull").sort((a,b)=>b.scores.trendScore-a.scores.trendScore));const bears=top(st.analyses.filter(x=>x.classification.marketState==="bear").sort((a,b)=>b.scores.bearScore-a.scores.bearScore));const renderRankList=(items,scoreKey)=>{if(!items.length)return`<div class="sub">No setups in this category right now.</div>`;return items.map((x,idx)=>`<div class="rank-item"><div class="rank-num">${idx+1}</div><div><div class="symbol" style="font-size:14px">${x.token.symbol}/USD</div><div class="sub" style="font-size:11px">${x.token.name} · ${x.classification.patternName}</div></div><div style="text-align:right"><div class="value" style="font-family:'IBM Plex Mono',monospace">${x.scores[scoreKey]}</div><div class="sub ${x.market.change24hPct>=0?"g":"r"}" style="font-size:11px">${fmt.pct(x.market.change24hPct)}</div></div></div>`).join("")};els.breakoutList.innerHTML=renderRankList(breakouts,"breakoutScore");els.pullbackList.innerHTML=renderRankList(pullbacks,"pullbackScore");els.bullList.innerHTML=renderRankList(bulls,"trendScore");els.bearList.innerHTML=renderRankList(bears,"bearScore")}
+
+function setFooter(message){els.footerText.textContent=message}
+function renderAll(){renderSessionBar();renderTokenList();renderDetail();renderSummary();els.liveText.textContent=`LIVE · CoinGecko · ${fmt.time(st.lastUpdated)}`;setFooter(`v${APP_VERSION} · ${st.analyses.length}/${UNIVERSE.length} tokens scanned · ${st.missing.length} missing · updated ${fmt.dateTime(st.lastUpdated)}`)}
+
+async function refreshData(){if(st.refreshInFlight)return;st.refreshInFlight=true;els.refreshBtn.textContent="Refreshing...";setFooter("Refreshing live market data...");try{const rows=await fetchMarketRows();const{analyses,missing}=buildAnalyses(rows);st.analyses=analyses;st.missing=missing;st.lastUpdated=Date.now();if(!st.selectedId&&analyses.length)st.selectedId=analyses[0].token.symbol;renderAll()}catch(err){st.apiErrors+=1;setFooter(`Refresh failed: ${err.message}`);console.error(err)}finally{st.refreshInFlight=false;els.refreshBtn.textContent="Refresh"}}
+
+function bindEvents(){els.tabs.forEach(tab=>{tab.addEventListener("click",()=>{els.tabs.forEach(t=>t.classList.remove("active"));els.views.forEach(v=>v.classList.remove("active"));tab.classList.add("active");document.getElementById(tab.dataset.view).classList.add("active")})});[els.signalFilter,els.stateFilter,els.sortBy].forEach(el=>{el.addEventListener("change",renderAll)});els.searchInput.addEventListener("input",renderAll);els.refreshBtn.addEventListener("click",refreshData)}
+
+bindEvents();renderSessionBar();refreshData();setInterval(refreshData,REFRESH_MS);
+</script>
 </body>
 </html>
